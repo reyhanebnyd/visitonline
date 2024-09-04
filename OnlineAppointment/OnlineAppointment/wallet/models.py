@@ -2,7 +2,7 @@ from django.db import models
 from user.models import Appuser
 
 
-class Wallet(models.Model):  # Inherit from models.Model
+class Wallet(models.Model):
     id = models.OneToOneField(
         Appuser,
         on_delete=models.CASCADE,
