@@ -13,7 +13,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 class UserRegisterView(View):
     form_class = UserREgisterForm
-    template_name = 'account/register.html'
+    template_name = 'user/register.html'
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
@@ -35,7 +35,7 @@ class UserRegisterView(View):
 
 class UserLoginView(View):
     form_class = UserLoginForm
-    template_name = 'account/login.html'
+    template_name = 'user/login.html'
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
