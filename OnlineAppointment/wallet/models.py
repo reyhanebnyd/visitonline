@@ -1,5 +1,5 @@
 from django.db import models
-from user.models import Appuser
+from OnlineAppointment.user.models import Appuser
 
 
 class Wallet(models.Model):
