@@ -1,0 +1,68 @@
+<!-- doctor/templates/doctor/doctor_detail.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ doctor.name }} Details</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .available {
+            background-color: #4CAF50; /* Green */
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ doctor.name }}</h1>
+    <p>Career: {{ doctor.career }}</p>
+    <p>Price: ${{ doctor.price }}</p>
+
+    <h2>Available Time Slots</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Weekday</th>
+                <th>Available Time Slots</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for day, slots in available_slots.items %}
+            <tr>
+                <td>{{ day }}</td>
+                <td>
+                    {% if slots %}
+                    <ul>
+                        {% for slot in slots %}
+                        <li class="available" onclick="reserveTime('{{ slot }}')">{{ slot }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    No available times.
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        function reserveTime(slot) {
+            alert("You have selected: " + slot);
+            // Here you can implement the logic to reserve the time slot
+        }
+    </script>
+</body>
+</html>
