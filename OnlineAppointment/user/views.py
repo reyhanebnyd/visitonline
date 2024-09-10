@@ -8,7 +8,10 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import login , authenticate , logout
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, UpdateView, DeleteView
+from .models import Appuser
+from .forms import AppuserCreationForm,AppuserUpdateForm
 # Create your views here.
 
 class UserRegisterView(View):
@@ -62,3 +65,28 @@ class UserLogoutView(LoginRequiredMixin,View):
         logout(request)
         messages.success(request , 'you logout successfully' , 'success')    
         return redirect('home :home')
+
+    
+# Naderkhani
+class SignUpView(CreateView):
+    form_class = AppuserCreationForm
+    success_url = reverse_lazy('login')  
+    template_name = 'user/signup.html'
+
+class UserUpdateView(LoginRequiredMixin, UpdateView):
+    model = Appuser
+    form_class = AppuserUpdateForm
+    success_url = reverse_lazy('profile')  
+    template_name = 'user/user_form.html'
+
+    def get_object(self):
+        return self.request.user  
+
+
+class UserDeleteView(LoginRequiredMixin, DeleteView):
+    model = Appuser
+    success_url = reverse_lazy('home')  
+    template_name = 'user/user_confirm_delete.html'
+
+    def get_object(self):
+        return self.request.user  
