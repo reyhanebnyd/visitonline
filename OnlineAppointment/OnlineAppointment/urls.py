@@ -20,5 +20,5 @@ from doctor.views import Add_doctor
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('adddoctor/',Add_doctor),
+    path('adddoctor/',Add_doctor.as_view()),
 ]

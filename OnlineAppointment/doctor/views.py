@@ -1,6 +1,7 @@
 from django.shortcuts import render
+from django.views.generic.edit import CreateView
 from .models import Doctor
-from django.db.models import Q
+from .forms import DoctorForm
 import datetime
 
 # Create your views here.
@@ -11,6 +12,21 @@ def search(request):
         return render(request, 'searchres.html',{'searched':searched,'doctors':doctors})#
     else:
         return render(request, 'searchres.html',{})
+
+# def timesheet(s,e,a):
+#     start_datetime = datetime.datetime.combine(datetime.date.today(), s)
+#     end_datetime = datetime.datetime.combine(datetime.date.today(), e)  
+#     ts = (end_datetime - start_datetime).total_seconds()
+#     intervals = []
+#     current_time = start_datetime
+#     n=int(ts//(a*60))
+#     for _ in range(n):
+#         next_time = current_time + datetime.timedelta(seconds=a*60)
+#         intervals.append((current_time.time(), next_time.time()))
+#         current_time = next_time
+#     remaining_seconds = ts - (a *60 * n)
+#     return intervals
+
 
 def is_valid_query(param):
     return param != '' and param is not None
@@ -23,7 +39,7 @@ def filter(request):
     avg_visit_time = request.GET.get('avg_visit_time')
     
     if is_valid_query(career):
-        qs = qs.filter(Q(name__icontains = career) | Q(writer__icontains = authororname_contains)).distinct()
+        qs = qs.filter(name__icontains = career)
     elif is_valid_query(price):
         qs = qs.filter(id = price )
     
@@ -35,22 +51,22 @@ def filter(request):
         'queryset' : qs
     }
     return render(request,'filterres.html',context)
-class Add_doctor(CraeteView):
+class Add_doctor(CreateView):
     model = Doctor
     form_class = DoctorForm
-    template_name = "Doctordetail.html"
-    def form_void(self, form):
-        # Original Values
-        name = form.cleaned_data['name']
-        starttime = form.cleaned_data['starttime']
-        endtime = form.cleaned_data['endtime']
-        avgtime = form.cleaned_data['avgtime']
-        # Modified Value
-        jsontsh = timesheet(starttime,endtime,avgtime)
-        instance = form.save(commit=False)
-        instance.avg_time_visit = jsontsh
-        instance.save()
-        return super().form_valid(form)
+    template_name = "adddoctor.html"
+    # def form_void(self, form):
+    #     # Original Values
+    #     name = form.cleaned_data['name']
+    #     starttime = form.cleaned_data['starttime']
+    #     endtime = form.cleaned_data['endtime']
+    #     avgtime = form.cleaned_data['avgtime']
+    #     # Modified Value
+    #     jsontsh = timesheet(starttime,endtime,avgtime)
+    #     instance = form.save(commit=False)
+    #     instance.accesstime = jsontsh
+    #     instance.save()
+    #     return super().form_valid(form)
 class Doctordetails():
     model = Doctor
     template_name = 'Doctordetails.html'
