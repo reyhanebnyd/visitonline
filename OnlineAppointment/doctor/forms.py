@@ -1,23 +1,8 @@
 from django.forms import ModelForm,TimeInput,TimeField
 from .models import Doctor
-import datetime
-
-def timesheet(s,e,a):
-    start_datetime = datetime.datetime.combine(datetime.date.today(), s)
-    end_datetime = datetime.datetime.combine(datetime.date.today(), e)  
-    ts = (end_datetime - start_datetime).total_seconds()
-    intervals = []
-    current_time = start_datetime
-    n=int(ts//(a*60))
-    for _ in range(n):
-        next_time = current_time + datetime.timedelta(seconds=a*60)
-        intervals.append((current_time.time(), next_time.time()))
-        current_time = next_time
-    return intervals
 
 
 # For future: add a disable button for disable a day
-from django.forms import TimeInput
 
 class DoctorForm(ModelForm):
     # Custom TimeInput with additional attributes
@@ -50,7 +35,6 @@ class DoctorForm(ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        avgtime = cleaned_data.get('avg_visit_time')
 
         jsonh = {}
 
@@ -60,8 +44,10 @@ class DoctorForm(ModelForm):
             starttime = cleaned_data.get(f'{day}_start')
             endtime = cleaned_data.get(f'{day}_end')
             
-            if starttime and endtime and avgtime:
-                jsonh[day] = timesheet(starttime, endtime, avgtime)
+            if starttime and endtime:
+                jsonh[day] = (starttime, endtime)
+            else:
+                jsonh[day] = 'Off'
 
         cleaned_data['accesstime'] = jsonh
 
