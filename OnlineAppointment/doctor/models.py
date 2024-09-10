@@ -19,4 +19,3 @@ class Fulltimes(models.Model):
         on_delete=models.CASCADE,
     )
     accessdate = models.DateTimeField()
-    paid = models.BooleanField(default=False)

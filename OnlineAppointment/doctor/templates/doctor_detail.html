@@ -1,66 +1,46 @@
-<!-- doctor/templates/doctor/doctor_detail.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ doctor.name }} Details</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        .available {
-            background-color: #28a745; /* Green */
-            color: white;
-            cursor: pointer;
-        }
-        .booked {
-            background-color: #dc3545; /* Red */
-            color: white;
-        }
-        .selected {
-            background-color: #007bff; /* Blue */
-            color: white;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>{{ doctor.name }}</h1>
-        <p>Career: {{ doctor.career }}</p>
-        <p>Price: ${{ doctor.price }}</p>
+<!-- doctor/templates/doctor/doctor_detail.html -->  
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>{{ doctor.name }}'s Detail</title>  
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">  
+</head>  
+<body>  
+    <div class="container">  
+        <h1>{{ doctor.name }}</h1>  
+        <p>Career: {{ doctor.career }}</p>  
+        <p>Price: ${{ doctor.price }}</p>  
 
-        <h2>Available Time Slots</h2>
-        <div class="row">
-            {% for day, slots in available_slots.items %}
-            <div class="col-md-4">
-                <h5>{{ day }}</h5>
-                <ul class="list-group">
-                    {% if slots %}
-                    {% for slot in slots %}
-                    <li class="list-group-item available" onclick="reserveTime('{{ slot }}')">{{ slot }}</li>
-                    {% endfor %}
-                    {% else %}
-                    <li class="list-group-item">No available times.</li>
-                    {% endif %}
-                </ul>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
+        <h2>Available Time Slots</h2>  
+        <div class="row">  
+            {% for day, slots in available_slots.items %}  
+            <div class="col-md-4">  
+                <h5>{{ day }}</h5>  
+                <ul class="list-group">  
+                    {% if slots %}  
+                        {% for start_time, end_time in slots %}  
+                            <li class="list-group-item available"   
+                                onclick="reserveTime('{{ start_time }} - {{ end_time }}')">  
+                                {{ start_time }} - {{ end_time }}  
+                            </li>  
+                        {% endfor %}  
+                    {% else %}  
+                        <li class="list-group-item">No available times.</li>  
+                    {% endif %}  
+                </ul>  
+            </div>  
+            {% endfor %}  
+        </div>  
+    </div>  
 
-    <script>
-        let selectedSlot = null;
-
-        function reserveTime(slot) {
-            if (selectedSlot) {
-                document.querySelector(`.selected`).classList.remove('selected');
-            }
-            selectedSlot = slot;
-            alert("You have selected: " + slot);
-            // Highlight the selected slot
-            event.target.classList.add('selected');
-            // Redirect to payment page
-            window.location.href = `/payment?slot=${slot}`;
-        }
-    </script>
-</body>
+    <script>  
+        function reserveTime(slot) {  
+            alert("You have selected: " + slot);  
+            // Redirect or perform further actions as required  
+            // Example: window.location.href = `/payment?slot=${slot}`;  
+        }  
+    </script>  
+</body>  
 </html>
