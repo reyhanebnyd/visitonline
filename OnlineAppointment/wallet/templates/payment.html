@@ -1,0 +1,19 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment</title>
+</head>
+<body>
+    <h1>Payment for Appointment</h1>
+    <p>You have selected the time slot: {{ slot }}</p>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="slot" value="{{ slot }}">
+        <input type="hidden" name="doctor_id" value="{{ doctor_id }}">
+        <button type="submit">Pay Now</button>
+    </form>
+</body>
+</html>

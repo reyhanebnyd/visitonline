@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView
 from .models import Doctor, Fulltimes
 from django.shortcuts import get_object_or_404
@@ -45,3 +45,5 @@ class DoctorDetailView(DetailView):
         context['available_slots'] = available_slots
 
         return context
+
+
