@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'wallet',
     'user',
     'doctor',
-    'user.apps.UserConfig',
+    
 ]
 
 MIDDLEWARE = [

@@ -10,7 +10,7 @@ class UserREgisterForm(forms.Form):
     password2 =forms.CharField(label='confirm password',widget=forms.PasswordInput(attrs={'class' : 'form-control'}))
 
     def clean_email(self):
-        email = self.changed_data['email']
+        email = self.cleaned_data['email']
         user = User.objects.filter(email=email).exists()
         if user:
             raise ValidationError('this email already exists')
