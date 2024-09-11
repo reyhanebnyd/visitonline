@@ -1,6 +1,6 @@
 from django.forms import ModelForm,TimeInput,TimeField
 from .models import Doctor
-
+import datetime
 
 # For future: add a disable button for disable a day
 
@@ -45,10 +45,17 @@ class DoctorForm(ModelForm):
             endtime = cleaned_data.get(f'{day}_end')
             
             if starttime and endtime:
-                jsonh[day] = (starttime, endtime)
+                print('-----------------------')
+                jsonh[day] = (starttime.strftime('%H:%M') , endtime.strftime('%H:%M') )
             else:
                 jsonh[day] = 'Off'
 
         cleaned_data['accesstime'] = jsonh
 
         return cleaned_data
+    def save(self, commit=True):
+        doctor = super().save(commit=False)
+        doctor.accesstime = self.cleaned_data['accesstime']
+        if commit:
+            doctor.save()
+        return doctor

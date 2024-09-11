@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.views.generic.edit import CreateView
 from .models import Doctor
 from .forms import DoctorForm
@@ -45,24 +45,14 @@ class Add_doctor(CreateView):
     model = Doctor
     form_class = DoctorForm
     template_name = "adddoctor.html"
+    def form_valid(self, form):
+        # Save the object
+        object = form.save()
 
+        # Redirect to the detail view of the created object
+        return redirect('adddoctor')
 
 class Doctordetails:
     model = Doctor
     template_name = "Doctordetails.html"
 
-    def get_queryset(self):
-        # Get the list of time ranges from your database
-        time_ranges = Doctor.objects.all()
-
-        # Calculate the dates for the table
-        today = datetime.date.today()
-        dates = [today + datetime.timedelta(days=x) for x in range(7)]
-
-        # Create a list of tuples representing the time ranges and dates
-        table_data = []
-        for date in dates:
-            for time_range in time_ranges:
-                table_data.append((date, time_range.accessdate))
-
-        return table_data
