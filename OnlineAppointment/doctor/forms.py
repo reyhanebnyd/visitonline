@@ -1,6 +1,6 @@
 from django.forms import ModelForm,TimeInput,TimeField
 from .models import Doctor
-import datetime
+
 
 # For future: add a disable button for disable a day
 
@@ -9,8 +9,7 @@ class DoctorForm(ModelForm):
     time_widget = TimeInput(attrs={
         'type': 'time', 
         'min': '05:00',
-        'max': '23:30',
-        'required': 'required'
+        'max': '23:30'
     })
 
     # Fields for each day of the week with the custom widget
@@ -50,12 +49,12 @@ class DoctorForm(ModelForm):
             else:
                 jsonh[day] = 'Off'
 
-        cleaned_data['accesstime'] = jsonh
+        cleaned_data['accessdate'] = jsonh
 
         return cleaned_data
     def save(self, commit=True):
         doctor = super().save(commit=False)
-        doctor.accesstime = self.cleaned_data['accesstime']
+        doctor.accessdate = self.cleaned_data['accessdate']
         if commit:
             doctor.save()
         return doctor
