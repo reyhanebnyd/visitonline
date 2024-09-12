@@ -6,11 +6,9 @@
     {% block head %}{% endblock %}
 </head>
 <body>
-    <nav>
+    {% comment %} <nav>
         <ul>
-            <li><a href="{% url  'home' %}">Home</a></li>
-            <li><a href="{% url 'about' %}">About</a></li>
-            <li><a href="{% url 'contact' %}">Contact</a></li>  
+            <li><a href="{% url  'index' %}">Home</a></li> 
             <li>
                 <form action="{% url 'search' %}" method="get">
                     <input type="text" name="query" placeholder="Search">
@@ -18,7 +16,7 @@
                 </form>
             </li>
         </ul>
-    </nav>
+    </nav> {% endcomment %}
     {% block header %}{% endblock %}
     {% block content %}{% endblock %}
     {% block footer %}{% endblock %}
