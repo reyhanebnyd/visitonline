@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% if not id_D.dcomments.all %}
+    no comments yet ...<a href="#">add one ...</a>
+    {% else %}
+        {% for comment in id_D.dcomments.all %}
+            <strong>
+                {{comment.id_U}} - {{comment.created}}
+            </strong>
+            {{comment.content}}    
+        {% endfor %}
+    {% endif %}
+
+{% endblock %}
