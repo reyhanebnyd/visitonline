@@ -10,13 +10,13 @@ class Doctor(models.Model):
 
 
 class Fulltimes(models.Model):
-    id_U = models.OneToOneField(
+    id_U = models.ForeignKey(
         'user.Appuser',
         on_delete=models.CASCADE,
     )
-    id_D = models.OneToOneField(
+    id_D = models.ForeignKey(
         Doctor,
         on_delete=models.CASCADE,
     )
     accessdate = models.DateTimeField()
-    paid = models.BooleanField(default=False)
+    

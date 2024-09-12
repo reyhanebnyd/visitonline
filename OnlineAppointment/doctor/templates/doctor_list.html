@@ -1,37 +1,42 @@
-<!-- doctor/templates/doctor/doctor_list.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doctor List</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-100">
-    <div class="container mx-auto p-4">
-        <h1 class="text-2xl font-bold mb-4">List of Doctors</h1>
-        <table class="min-w-full bg-white border border-gray-300">
-            <thead>
-                <tr>
-                    <th class="py-2 px-4 border-b">Name</th>
-                    <th class="py-2 px-4 border-b">Career</th>
-                    <th class="py-2 px-4 border-b">Price</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for doctor in doctors %}
-                <tr>
-                    <td class="py-2 px-4 border-b">{{ doctor.name }}</td>
-                    <td class="py-2 px-4 border-b">{{ doctor.career }}</td>
-                    <td class="py-2 px-4 border-b">${{ doctor.price }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="3" class="py-2 px-4 text-center">No doctors available.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</body>
+<!DOCTYPE html>  
+<html lang="en">  
+
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Doctor List</title>  
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">  
+</head>  
+
+<body class="bg-gray-100">  
+    <div class="container mx-auto p-4">  
+        <h1 class="text-3xl font-bold mb-6 text-center">List of Doctors</h1>  
+        
+        <div class="overflow-x-auto shadow-lg rounded-lg">  
+            <table class="min-w-full bg-white border border-gray-300 rounded-lg">  
+                <thead>  
+                    <tr class="bg-gray-200 text-gray-700">  
+                        <th class="py-3 px-4 border-b">Name</th>  
+                        <th class="py-3 px-4 border-b">Career</th>  
+                        <th class="py-3 px-4 border-b">Price</th>  
+                    </tr>  
+                </thead>  
+                <tbody>  
+                    {% for doctor in doctors %}  
+                    <tr class="hover:bg-gray-100 cursor-pointer" onclick="location.href='{% url 'doctor-detail' doctor.id %}'">  
+                        <td class="py-3 px-4 border-b">{{ doctor.name }}</td>  
+                        <td class="py-3 px-4 border-b">{{ doctor.career }}</td>  
+                        <td class="py-3 px-4 border-b">${{ doctor.price }}</td>  
+                    </tr>  
+                    {% empty %}  
+                    <tr>  
+                        <td colspan="3" class="py-3 px-4 text-center">No doctors available.</td>  
+                    </tr>  
+                    {% endfor %}  
+                </tbody>  
+            </table>  
+        </div>  
+    </div>  
+</body>  
+
 </html>
