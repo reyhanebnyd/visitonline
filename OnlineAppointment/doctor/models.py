@@ -18,10 +18,5 @@ class Fulltimes(models.Model):
         Doctor,
         on_delete=models.CASCADE,
     )
-<<<<<<< HEAD
-    fulltime = models.DateTimeField()
-    paid = models.BooleanField(default=False)
-=======
     accessdate = models.DateTimeField()
     
->>>>>>> origin/doctor-reyhane-showlist
