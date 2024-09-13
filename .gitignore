@@ -5,12 +5,7 @@
 __pycache__
 db.sqlite3
 media
-<<<<<<< HEAD
 LAB.py
-=======
-doctor/__pycache__
-
->>>>>>> origin/doctor-reyhane-showlist
 # Backup files # 
 *.bak 
 
