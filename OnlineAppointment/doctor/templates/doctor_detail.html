@@ -39,7 +39,7 @@
                 <ul class="list-group">  
                     {% if slots %}  
                     {% for slot in slots %}  
-                    {% if slot|length == 3 %}  {# Check if the slot has a booked flag #}  
+                    {% if slot.2 %}  {# Check if the slot has a booked flag #}  
                     <li class="list-group-item booked">{{ slot.0 }}</li>  {# Booked slot #}  
                     {% else %}  
                     <li class="list-group-item available" onclick="reserveTime('{{ slot.1 }}', this)">{{ slot.0 }}</li>  {# Available slot #}  

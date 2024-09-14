@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block header_title %}{% endblock %}</title>
+    <title>{% block header_title %}Online Resevrvaiton System {% endblock %}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -147,8 +147,29 @@
         }
     </style>
 </head>
+
+
 <body>
-<div class="container">
+    <nav>
+        <ul>
+            <li><a href="{% url  'doctor-list' %}">Doctors</a></li> 
+            <li>
+                <form action="{% url 'doctor-list' %}" method="GET">
+                    <div class="form-group">
+                    <label for="search_term">Search Term:</label>
+                    <input type="text" class="form-control" id="search_term" name="search_term"  
+                    value="{{ search_form.search_term.value }}">
+                    </div>
+            
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+                <form method="POST" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit">Logout</button>
+                </form>
+            </li>
+        </ul>
+    </nav> <div class="container">
     <h2>{% block title %}{% endblock %}</h2>
     <div class="form-card">
         {% block content %}{% endblock %}

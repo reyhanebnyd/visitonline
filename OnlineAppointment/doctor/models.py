@@ -11,7 +11,7 @@ class Doctor(models.Model):
 
 class Fulltimes(models.Model):
     id_U = models.ForeignKey(
-        'user.Appuser',
+        "user.Appuser",
         on_delete=models.CASCADE,
     )
     id_D = models.ForeignKey(
@@ -19,4 +19,3 @@ class Fulltimes(models.Model):
         on_delete=models.CASCADE,
     )
     accessdate = models.DateTimeField()
-    

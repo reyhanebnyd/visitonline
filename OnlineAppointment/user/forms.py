@@ -1,17 +1,12 @@
-from django import forms  
-from django.contrib.auth.forms import UserCreationForm  
-from django.contrib.auth.models import User  
-from .models import Appuser  
+from django import forms
+from .models import Comments
 
-class WalletUserSignupForm(UserCreationForm):  
-    email = forms.EmailField(required=True)  
 
-    class Meta:  
-        model = User  # Change to use the User model directly  
-        fields = ('username', 'email', 'password1', 'password2')  
 
-    def save(self, commit=True):  
-        user = super().save(commit)  
-        # Create the related Appuser instance  
-        Appuser.objects.create(user=user)  
-        return user
+class CommentForm (forms.ModelForm):
+    class Meta:
+        model = Comments
+        fields = ['context']
+        widgets = {
+            'context': forms.Textarea(attrs={'class':'form-control', 'placeholder': 'write your comment ...'}),
+        }    
