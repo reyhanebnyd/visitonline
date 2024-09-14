@@ -73,9 +73,11 @@ class DoctorDetailView(DetailView):
 
     def get_context_data(self, **kwargs):  
         context = super().get_context_data(**kwargs)  
+
         doctor = self.object  
         doctor1 = self.get_object()
         access_dates = doctor.accessdate  
+        print('accessdate is', access_dates)
 
         occupied_times = Fulltimes.objects.filter(id_D=doctor).values_list('accessdate', flat=True)   
         occupied_times_str = set(occupied_times)
@@ -122,5 +124,6 @@ class DoctorDetailView(DetailView):
         context['available_slots'] = available_slots  
         context['occupied_times'] = occupied_times  # This can be used in the template  
         context['doctor'] = doctor1
+        print('available slots are', available_slots)
 
         return context  

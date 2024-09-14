@@ -37,19 +37,23 @@ class DoctorForm(ModelForm):
 
         jsonh = {}
 
-        days_of_week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+        days_of_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
         
         for day in days_of_week:
             starttime = cleaned_data.get(f'{day}_start')
             endtime = cleaned_data.get(f'{day}_end')
+            print(starttime, endtime)
+            print('---------------')
             
             if starttime and endtime:
                 print('-----------------------')
+                
                 jsonh[day] = (starttime.strftime('%H:%M') , endtime.strftime('%H:%M') )
             else:
                 jsonh[day] = 'Off'
 
         cleaned_data['accessdate'] = jsonh
+        print('clean data is', cleaned_data)
 
         return cleaned_data
     def save(self, commit=True):
