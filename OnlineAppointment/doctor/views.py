@@ -47,6 +47,7 @@ class DoctorListView(ListView):
             pricemi = filter_form.cleaned_data.get('pricemi')
             avg_visit_time = filter_form.cleaned_data.get('avg_visit_time')
 
+<<<<<<< HEAD
             if pricema:
                 queryset = queryset.filter(price__lte=pricema)
             if pricemi:
@@ -74,6 +75,15 @@ class DoctorDetailView(LoginRequiredMixin, DetailView):
         doctor = self.object
         doctor1 = self.get_object()
         access_dates = doctor.accessdate
+=======
+    def get_context_data(self, **kwargs):  
+        context = super().get_context_data(**kwargs)  
+
+        doctor = self.object  
+        doctor1 = self.get_object()
+        access_dates = doctor.accessdate  
+        print('accessdate is', access_dates)
+>>>>>>> wallet-reyhane-payment
 
         occupied_times = Fulltimes.objects.filter(id_D=doctor).values_list(
             "accessdate", flat=True
@@ -122,12 +132,19 @@ class DoctorDetailView(LoginRequiredMixin, DetailView):
                         appointment_date, start_time.time()
                     ).isoformat()
 
+<<<<<<< HEAD
                     # What is happening here?
                     full_slot_start_dt = datetime.fromisoformat(
                         full_slot_start_str
                     ).replace(tzinfo=dt_timezone.utc)
                     # Could be replaced with tupel
                     formatted_slot = f"{slot_start} - {slot_end}"
+=======
+        context['available_slots'] = available_slots  
+        context['occupied_times'] = occupied_times  # This can be used in the template  
+        context['doctor'] = doctor1
+        print('available slots are', available_slots)
+>>>>>>> wallet-reyhane-payment
 
                     # Refactored / If occupied, still add it but mark as booked
                     blocked = full_slot_start_dt in occupied_times_str
