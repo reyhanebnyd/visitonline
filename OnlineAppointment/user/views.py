@@ -1,16 +1,14 @@
 from django.contrib.auth import login
 from django.shortcuts import render, redirect
+from django.contrib.auth.forms import UserCreationForm
 
-from user.forms import WalletUserSignupForm
-
-
-def signup_view(request):
+def signup(request):
     if request.method == 'POST':
-        form = WalletUserSignupForm(request.POST)
+        form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)  # Log the user in after sign up
-            return redirect('doctor-list')  # Redirect to a home page or another page
+            login(request, user)  # Automatically log in after signup
+            return redirect('doctor-list')  # Redirect to homepage after signup
     else:
-        form = WalletUserSignupForm()
+        form = UserCreationForm()
     return render(request, 'signup.html', {'form': form})

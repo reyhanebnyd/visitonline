@@ -39,7 +39,7 @@
                 <ul class="list-group">  
                     {% if slots %}  
                     {% for slot in slots %}  
-                    {% if slot|length == 3 %}  {# Check if the slot has a booked flag #}  
+                    {% if slot.2 %}  {# Check if the slot has a booked flag #}  
                     <li class="list-group-item booked">{{ slot.0 }}</li>  {# Booked slot #}  
                     {% else %}  
                     <li class="list-group-item available" onclick="reserveTime('{{ slot.1 }}', this)">{{ slot.0 }}</li>  {# Available slot #}  
@@ -90,6 +90,27 @@
                 alert("Please select a time slot to reserve.");  
             }  
         }
-    </script>  
+    </script> 
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ comment_form.comment_text.label_tag }}
+            {{ comment_form.comment_text }}
+        </div>
+        <div class="form-group">
+            {{ comment_form.rating.label_tag }}
+            {{ comment_form.rating }}
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Comment</button>
+    </form>
+    {% for comment in comments %}
+    {{ comment.user }}
+    {{ comment.created_at.date }}
+    |{{ comment.rating }}|
+    <p>----------</p>
+    {{ comment.comment_text }}
+    <p>***********</p>
+    <br>
+    {% endfor %}
 </body>  
 </html>
