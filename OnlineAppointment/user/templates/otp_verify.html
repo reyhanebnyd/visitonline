@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block header_title %}
+ - OTP Verification
+{% endblock %}
+
+{% block title %}
+ - OTP Verification
+{% endblock %}
+
+{% block content %}
+    <h2>Enter OTP</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        <label for="otp">OTP Code:</label>
+        <input type="text" name="otp" id="otp" required>
+        <button type="submit">Verify OTP</button>
+    </form>
+{% endblock %}
