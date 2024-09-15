@@ -1,5 +1,6 @@
-from django.forms import ModelForm, TimeInput, TimeField,Form,CharField
-from .models import Doctor
+from django.forms import ModelForm, TimeInput, TimeField, Form, CharField, IntegerField, Textarea, Select
+from .models import Doctor, Comment
+
 
 class DoctorForm(ModelForm):
     # Custom TimeInput with additional attributes
@@ -62,12 +63,23 @@ class DoctorForm(ModelForm):
             doctor.save()
         return doctor
 
+
 class SearchForm(Form):
     search_term = CharField(max_length=100, required=False)
 
-from django import forms
 
-class FilterForm(forms.Form):
-    pricema = forms.IntegerField(required=False, label='Max Price(dollers)')
-    pricemi = forms.IntegerField(required=False, label='Min Price(dollers)')
-    avg_visit_time = forms.IntegerField(required=False, label='Max Average visit time(Minutes)')
+class FilterForm(Form):
+    pricema = IntegerField(required=False, label="Max Price(dollers)")
+    pricemi = IntegerField(required=False, label="Min Price(dollers)")
+    avg_visit_time = IntegerField(
+        required=False, label="Max Average visit time(Minutes)"
+    )
+
+class CommentForm(ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['comment_text', 'rating']
+        widgets = {
+            'comment_text': Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'rating': Select(choices=[(i, i) for i in range(1, 6)], attrs={'class': 'form-control'}),
+        }

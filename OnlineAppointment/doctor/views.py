@@ -1,11 +1,12 @@
-from .models import Doctor, Fulltimes
-from .forms import DoctorForm,SearchForm, FilterForm
+from .models import Doctor, Fulltimes, Comment
+from user.models import Appuser
+from .forms import DoctorForm,SearchForm, FilterForm, CommentForm
 from datetime import datetime, timedelta, timezone as dt_timezone
 from django.utils import timezone
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from django.views.generic import CreateView, ListView, DetailView
 from django.db.models import Q
-
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 class Add_doctor(CreateView):
     model = Doctor
@@ -62,10 +63,11 @@ class DoctorListView(ListView):
         context['filter_form'] = FilterForm(self.request.GET)
         return context
 
-class DoctorDetailView(DetailView):
+class DoctorDetailView(LoginRequiredMixin, DetailView):
     model = Doctor
     template_name = "doctor_detail.html"
     context_object_name = "doctor"
+    login_url='/login'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -134,9 +136,31 @@ class DoctorDetailView(DetailView):
                     )
 
                     start_time += timedelta(minutes=avg_visit_time)
-
+        comments = Comment.objects.filter(doctor=doctor1).order_by('-created_at')
+        context['comment_form'] = CommentForm(self.request.GET)
+        context['comments'] = comments
         context["available_slots"] = available_slots
         context["occupied_times"] = occupied_times  # This can be used in the template
         context["doctor"] = doctor1
 
         return context
+    def post(self, request, *args, **kwargs):
+        # Manually set the object since we're in a POST request
+        self.object = self.get_object()
+
+        # Process the comment form
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            # Create the comment but don't save it yet
+            new_comment = comment_form.save(commit=False)
+            new_comment.doctor = self.object
+            new_comment.user = request.user  # Assumes user is logged in
+            new_comment.save()  # Save the comment
+
+            # Redirect to the same page after submitting the form
+            return redirect("doctor-detail", pk=self.object.pk)
+
+        # If the form is invalid, reload the page with form errors
+        context = self.get_context_data()
+        context['comment_form'] = comment_form  # Show form with errors
+        return self.render_to_response(context)

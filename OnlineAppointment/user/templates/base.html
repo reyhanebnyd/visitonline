@@ -163,10 +163,12 @@
             
                     <button type="submit" class="btn btn-primary">Search</button>
                 </form>
+                {% if user.is_authenticated %}
                 <form method="POST" action="{% url 'logout' %}">
                     {% csrf_token %}
                     <button type="submit">Logout</button>
                 </form>
+                {% endif %}
             </li>
         </ul>
     </nav> <div class="container">

@@ -16,13 +16,15 @@
                     <input type="text" class="form-control" id="search_term" name="search_term"  
                     value="{{ search_form.search_term.value }}">
                     </div>
-            
                     <button type="submit" class="btn btn-primary">Search</button>
                 </form>
+                {% if user.is_authenticated %}
                 <form method="POST" action="{% url 'logout' %}">
                     {% csrf_token %}
                     <button type="submit">Logout</button>
                 </form>
+                {% else %}
+                {% endif %}
             </li>
         </ul>
     </nav> 

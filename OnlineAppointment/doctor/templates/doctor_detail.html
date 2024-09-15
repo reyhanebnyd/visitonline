@@ -90,6 +90,27 @@
                 alert("Please select a time slot to reserve.");  
             }  
         }
-    </script>  
+    </script> 
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ comment_form.comment_text.label_tag }}
+            {{ comment_form.comment_text }}
+        </div>
+        <div class="form-group">
+            {{ comment_form.rating.label_tag }}
+            {{ comment_form.rating }}
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Comment</button>
+    </form>
+    {% for comment in comments %}
+    {{ comment.user }}
+    {{ comment.created_at.date }}
+    |{{ comment.rating }}|
+    <p>----------</p>
+    {{ comment.comment_text }}
+    <p>***********</p>
+    <br>
+    {% endfor %}
 </body>  
 </html>
