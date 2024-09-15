@@ -168,6 +168,15 @@
                     {% csrf_token %}
                     <button type="submit">Logout</button>
                 </form>
+                {% else %}
+                <form action="{% url "login" %}" method="GET">
+                    {% csrf_token %}
+                    <button type='submit'>Login</button>
+                </form>
+                <form action="{% url "signup" %}" method="GET">
+                    {% csrf_token %}
+                    <button type='submit'>Sign up</button>
+                </form>
                 {% endif %}
             </li>
         </ul>
