@@ -30,12 +30,13 @@ def payment_view(request):
         doctor = Doctor.objects.get(id=doctor_id)  
         doctor_price = doctor.price  
         
-        
-        wallet = Wallet.objects.get(id_id=request.user.appuser)  # Adjust based on your Wallet model  
+        try:
+            wallet = Wallet.objects.get(uid_id=request.user.appuser)  # Adjust based on your Wallet model  
+        except:
+            Wallet.objects.create(uid = request.user.appuser)
         user_balance = wallet.balance  
-        
         if user_balance >= doctor_price:  
-              
+        
             reservation = Fulltimes.objects.create(  
                 id_U=request.user.appuser,  
                 id_D_id=doctor_id,  
@@ -71,7 +72,7 @@ def cancel_reservation(request, reservation_id):
     doctor = get_object_or_404(Doctor, id=reservation.id_D_id)   
     refund_amount = doctor.price  
 
-    wallet = get_object_or_404(Wallet, id_id=request.user.appuser)   
+    wallet = get_object_or_404(Wallet, uid_id=request.user.appuser)   
 
      
     wallet.balance += refund_amount  
@@ -88,16 +89,13 @@ class WalletDetailView(LoginRequiredMixin, DetailView):
     context_object_name = 'wallet'  
 
     def get_object(self, queryset=None):  
-         
-        wallet, created = Wallet.objects.get_or_create(id=self.request.user.appuser, defaults={'balance': 0.00})  
+        wallet = Wallet.objects.get(uid=self.request.user.appuser)  
         return wallet  
-
-    
 
 @login_required  
 def add_balance(request):  
      
-    wallet = get_object_or_404(Wallet, id=request.user.appuser)  
+    wallet = get_object_or_404(Wallet, uid=request.user.appuser)  
 
     if request.method == 'POST':  
         form = AddBalanceForm(request.POST)  
