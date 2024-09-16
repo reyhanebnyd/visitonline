@@ -59,7 +59,10 @@
                     <tr class="bg-gray-200 text-gray-700">  
                         <th class="py-3 px-4 border-b">Name</th>  
                         <th class="py-3 px-4 border-b">Career</th>  
-                        <th class="py-3 px-4 border-b">Price</th>  
+                        <th class="py-3 px-4 border-b">Price</th>
+                        {% if appuser.is_admin %}
+                        <th class="py-3 px-4 border-b" colspan="2">Action</th>
+                        {% endif %}  
                     </tr>  
                 </thead>  
                 <tbody>  
@@ -67,7 +70,11 @@
                     <tr class="hover:bg-gray-100 cursor-pointer" onclick="location.href='{% url 'doctor-detail' doctor.id %}'">  
                         <td class="py-3 px-4 border-b">{{ doctor.name }}</td>  
                         <td class="py-3 px-4 border-b">{{ doctor.career }}</td>  
-                        <td class="py-3 px-4 border-b">${{ doctor.price }}</td>  
+                        <td class="py-3 px-4 border-b">${{ doctor.price }}</td> 
+                        {% if appuser.is_admin %}
+                        <td class="py-3 px-4 border-b"><a href="{% url 'doctor-edited' doctor.id %}">Edit</a></td>
+                        <td class="py-3 px-4 border-b"><a href="{% url 'doctor-delete' doctor.id %}">Delete</a></td>
+                        {% endif %}
                     </tr>  
                     {% empty %}  
                     <tr>  

@@ -1,25 +1,50 @@
 from .models import Doctor, Fulltimes, Comment
-from user.models import Appuser
 from .forms import DoctorForm,SearchForm, FilterForm, CommentForm
+from user.models import Appuser
 from datetime import datetime, timedelta, timezone as dt_timezone
 from django.utils import timezone
-from django.shortcuts import render, redirect,get_object_or_404
-from django.views.generic import CreateView, ListView, DetailView
+from django.urls import reverse_lazy
+from django.shortcuts import redirect, get_object_or_404
+from django.views.generic import CreateView, ListView, DetailView, DeleteView, UpdateView
 from django.db.models import Q
-from django.contrib.auth.mixins import LoginRequiredMixin
-
-class Add_doctor(CreateView):
+from django.contrib.auth.mixins import LoginRequiredMixin,UserPassesTestMixin
+class Add_doctor(UserPassesTestMixin,CreateView):
     model = Doctor
     form_class = DoctorForm
     template_name = "adddoctor.html"
-
+    def test_func(self):
+        appuser = Appuser.objects.get(user=self.request.user)
+        return appuser.is_admin
     def form_valid(self, form):
         # Save the object
         object = form.save()
 
         # Redirect to the detail view of the created object
         return redirect("doctor-list")
-
+class Delete_doctor(UserPassesTestMixin,DeleteView):
+    model = Doctor
+    template_name = 'doctor/doctor_confirm_delete.html'
+    success_url = reverse_lazy('doctor-list') 
+    def test_func(self):
+        appuser = Appuser.objects.get(user=self.request.user)
+        return appuser.is_admin
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['doctor'] = get_object_or_404(Doctor, id=self.kwargs['pk'])
+        return context
+class Edit_doctor(UserPassesTestMixin,UpdateView):
+    model = Doctor
+    form_class = DoctorForm
+    template_name = 'updated.html'
+    success_url = reverse_lazy('doctor-list')  
+    def test_func(self):
+        appuser = Appuser.objects.get(user=self.request.user)
+        return appuser.is_admin
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Pass the doctor object for template usage
+        context['doctor'] = self.get_object()
+        return context
 
 
 class DoctorListView(ListView):
@@ -59,8 +84,10 @@ class DoctorListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        appuser = Appuser.objects.get(user=self.request.user)
         context['search_form'] = SearchForm(self.request.GET)
         context['filter_form'] = FilterForm(self.request.GET)
+        context['appuser']=  appuser
         return context
 
 class DoctorDetailView(LoginRequiredMixin, DetailView):

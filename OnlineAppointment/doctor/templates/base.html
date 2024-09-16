@@ -24,13 +24,13 @@
                     <button type="submit">Logout</button>
                 </form>
                 {% else %}
-                <form method="POST" action="{% url 'login' %}">
+                <form action="{% url "login" %}" method="GET">
                     {% csrf_token %}
-                    <button type="submit">Login</button>
+                    <button type='submit'>Login</button>
                 </form>
-                <form method="POST" action="{% url 'signup' %}">
+                <form action="{% url "signup" %}" method="GET">
                     {% csrf_token %}
-                    <button type="submit">Signup</button>
+                    <button type='submit'>Sign up</button>
                 </form>
                 {% endif %}
             </li>
