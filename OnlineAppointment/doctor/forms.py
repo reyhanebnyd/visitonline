@@ -1,5 +1,6 @@
 from django.forms import ModelForm, TimeInput, TimeField, Form, CharField, IntegerField, Textarea, Select
 from .models import Doctor, Comment
+from django import forms
 
 
 class DoctorForm(ModelForm):
@@ -75,7 +76,7 @@ class FilterForm(Form):
         required=False, label="Max Average visit time(Minutes)"
     )
 
-class CommentForm(ModelForm):
+class CommentForm(ModelForm): 
     class Meta:
         model = Comment
         fields = ['comment_text', 'rating']

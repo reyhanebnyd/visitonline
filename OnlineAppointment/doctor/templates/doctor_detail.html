@@ -1,4 +1,4 @@
-{% load my_filters %}
+{% load my_filters %}  
 <!DOCTYPE html>  
 <html lang="en">  
 <head>  
@@ -24,6 +24,10 @@
         .reserve-button {  
             display: none; /* Initially hidden */  
         }  
+        .time-slots {  
+            display: none; /* Initially hidden */  
+            margin-top: 10px;  
+        }  
     </style>  
 </head>  
 <body>  
@@ -41,33 +45,32 @@
                 <strong>No ratings yet.</strong>  
             {% endif %}  
         </h4>  
-        <h2>Available Time Slots</h2>  
+
+        <h2>Available Days</h2>  
         <div class="row">  
-            {% for day, slots in available_slots.items %}  
+            {% for date, details in available_days.items %}  
             <div class="col-md-4 mb-3">  
-                <h5>{{ day }}</h5>  
-                <ul class="list-group">  
-                    {% if slots %}  
-                    {% for slot in slots %}  
-                    {% if slot.2 %}  {# Check if the slot has a booked flag #}  
-                    <li class="list-group-item booked">{{ slot.0 }}</li>  {# Booked slot #}  
-                    {% else %}  
-                    <li class="list-group-item available" onclick="reserveTime('{{ slot.1 }}', this)">{{ slot.0 }}</li>  {# Available slot #}  
-                    {% endif %}  
-                    {% endfor %}  
-                    {% else %}  
-                    <li class="list-group-item">No available times.</li>  
-                    {% endif %}  
-                </ul>  
+                <h5 onclick="toggleTimeSlots('{{ date }}', this)">{{ details.name }} - {{ date }}</h5>  
+                <div class="time-slots" id="slots-{{ date }}">  
+                    <ul class="list-group">  
+                        {% for slot in details.slots %}  
+                            {% if slot.2 %}  {# Check if the slot has a booked flag #}  
+                                <li class="list-group-item booked">{{ slot.0 }}</li>  {# Booked slot #}  
+                            {% else %}  
+                                <li class="list-group-item available" onclick="reserveTime('{{ slot.1 }}', this)">{{ slot.0 }}</li>  {# Available slot #}  
+                            {% endif %}  
+                        {% endfor %}  
+                    </ul>  
+                </div>  
             </div>  
             {% endfor %}  
         </div>  
 
-        <form id="reservationForm" method="POST" action="{% url 'payment' %}">
-            {% csrf_token %}
-            <input type="hidden" id="slotInput" name="slot">
-            <input type="hidden" id="doctorIdInput" name="doctor_id" value="{{ doctor.id }}">
-        </form>
+        <form id="reservationForm" method="POST" action="{% url 'payment' %}">  
+            {% csrf_token %}  
+            <input type="hidden" id="slotInput" name="slot">  
+            <input type="hidden" id="doctorIdInput" name="doctor_id" value="{{ doctor.id }}">  
+        </form>  
 
         <div class="text-center">  
             <button id="reserveButton" class="btn btn-primary reserve-button" onclick="confirmReservation()">Reserve Time</button>  
@@ -76,6 +79,15 @@
 
     <script>  
         let selectedSlot = null;  
+
+        function toggleTimeSlots(date, headerElement) {  
+            const slotsDiv = document.getElementById(`slots-${date}`);  
+            if (slotsDiv.style.display === "none") {  
+                slotsDiv.style.display = "block";  
+            } else {  
+                slotsDiv.style.display = "none";  
+            }  
+        }  
 
         function reserveTime(full_slot_start, element) {   
             if (selectedSlot) {  
@@ -90,18 +102,18 @@
 
         function confirmReservation() {  
             if (selectedSlot) {  
-        // Set the value of the hidden input with the selected slot
-                document.getElementById('slotInput').value = selectedSlot;
-
-        // Submit the form
-                document.getElementById('reservationForm').submit();
-                window.location.href = `/payment?slot=${encodeURIComponent(selectedSlot)}&doctor_id=${encodeURIComponent(document.getElementById('doctorIdInput').value)}`;
+                // Set the value of the hidden input with the selected slot  
+                document.getElementById('slotInput').value = selectedSlot;  
+                // Submit the form  
+                document.getElementById('reservationForm').submit();  
+                // The following line is redundant since the form is being submitted, feel free to keep or remove it based on your needs  
+                window.location.href = `/payment?slot=${encodeURIComponent(selectedSlot)}&doctor_id=${encodeURIComponent(document.getElementById('doctorIdInput').value)}`;  
             } else {  
                 alert("Please select a time slot to reserve.");  
             }  
-        }
-    </script> 
+        }  
+    </script>   
      
-    {% include "comment_section.html" with comment_form=comment_form comments=comments %}
+    {% include "comment_section.html" with comment_form=comment_form comments=comments %}  
 </body>  
 </html>

@@ -70,79 +70,52 @@ class DoctorDetailView(LoginRequiredMixin, DetailView):
     context_object_name = "doctor"
     login_url='/login'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        doctor = self.object
-        doctor1 = self.get_object()
-        access_dates = doctor.accessdate
+    def get_context_data(self, **kwargs):  
+        context = super().get_context_data(**kwargs)  
+        doctor = self.get_object()  
+        access_dates = doctor.accessdate  
 
-        occupied_times = Fulltimes.objects.filter(id_D=doctor).values_list(
-            "accessdate", flat=True
-        )
-        occupied_times_str = set(occupied_times)
+        # Retrieve occupied dates  
+        occupied_times = Fulltimes.objects.filter(id_D=doctor).values_list(  
+            "accessdate", flat=True  
+        )  
+        occupied_times_str = set(occupied_times)  
 
-        available_slots = {}
-        avg_visit_time = int(doctor.avg_visit_time)
+        available_days = {}  
+        today = timezone.now().date()  
 
-        today = timezone.now().date()
-        week_days = {
-            0: "monday",
-            1: "tuesday",
-            2: "wednesday",
-            3: "thursday",
-            4: "friday",
-            5: "saturday",
-            6: "sunday",
-        }
+        # Define the range of dates (from today to a month ahead)  
+        date_range = [today + timedelta(days=i) for i in range(30)]  
 
-        for day, times in access_dates.items():
-            available_slots[day] = []
-            if len(times) == 2:
-                start_time_str = times[0]
-                end_time_str = times[1]
-                start_time = datetime.strptime(start_time_str, "%H:%M").replace(
-                    tzinfo=dt_timezone.utc
-                )
-                end_time = datetime.strptime(end_time_str, "%H:%M").replace(
-                    tzinfo=dt_timezone.utc
-                )
-                # To be refactor
-                day_index = list(week_days.keys())[list(week_days.values()).index(day)]
-                days_to_add = (day_index - today.weekday() + 7) % 7
-                if days_to_add == 0:
-                    days_to_add = 7
-                appointment_date = today + timedelta(days=days_to_add)
-                # -------
-                while start_time + timedelta(minutes=avg_visit_time) <= end_time:
-                    slot_start = start_time.strftime("%H:%M")
-                    slot_end = (
-                        start_time + timedelta(minutes=avg_visit_time)
-                    ).strftime("%H:%M")
+        # Mapping weekdays  
+        week_days = {  
+            0: "monday",  
+            1: "tuesday",  
+            2: "wednesday",  
+            3: "thursday",  
+            4: "friday",  
+            5: "saturday",  
+            6: "sunday",  
+        }  
 
-                    full_slot_start_str = datetime.combine(
-                        appointment_date, start_time.time()
-                    ).isoformat()
+        for date in date_range:  
+            weekday_name = week_days[date.weekday()]  
+            if weekday_name in access_dates and access_dates[weekday_name] != 'Off':
+                start_time_str, end_time_str = access_dates[weekday_name]  
+                start_time = datetime.strptime(start_time_str, "%H:%M").time()  
+                end_time = datetime.strptime(end_time_str, "%H:%M").time()  
+                
+                # Prepare available time slots for this date  
+                available_time_slots = self.get_available_time_slots(start_time, end_time, doctor, occupied_times_str)  
 
-                    # What is happening here?
-                    full_slot_start_dt = datetime.fromisoformat(
-                        full_slot_start_str
-                    ).replace(tzinfo=dt_timezone.utc)
-                    # Could be replaced with tupel
-                    formatted_slot = f"{slot_start} - {slot_end}"
-
-                    # Refactored / If occupied, still add it but mark as booked
-                    blocked = full_slot_start_dt in occupied_times_str
-                    available_slots[day].append(
-                        (formatted_slot, full_slot_start_str, blocked)
-                    )
-
-                    start_time += timedelta(minutes=avg_visit_time)
-        comments = Comment.objects.filter(doctor=doctor1).order_by('-created_at')
-        context['comment_form'] = CommentForm(self.request.GET)
-        context['comments'] = comments
-        context["available_slots"] = available_slots
-        context["occupied_times"] = occupied_times  # This can be used in the template
-        context["doctor"] = doctor1
+                # Only add to available_days if there are time slots  
+                if available_time_slots:  
+                    available_days[date] = {  
+                        'name': weekday_name,  
+                        'slots': available_time_slots  
+                    }  
+        context['available_days'] = available_days  
+        context['doctor'] = doctor    
         #-------------------------------------------------------
         #this part is to handle comments
         context['comments'] = Comment.objects.filter(doctor=self.object)  
@@ -154,6 +127,30 @@ class DoctorDetailView(LoginRequiredMixin, DetailView):
         context['average_rating'] = average_rating 
 
         return context
+
+    def get_available_time_slots(self, start_time, end_time, doctor, occupied_times):  
+        avg_visit_time = int(doctor.avg_visit_time)  
+        available_time_slots = []  
+
+        # Start from the start_time until the end_time  
+        current_time = datetime.combine(timezone.now().date(), start_time)  
+        end_time_dt = datetime.combine(timezone.now().date(), end_time)  
+
+        while current_time + timedelta(minutes=avg_visit_time) <= end_time_dt:  
+            slot_start_str = current_time.strftime("%H:%M")  
+            slot_end_str = (current_time + timedelta(minutes=avg_visit_time)).strftime("%H:%M")  
+            full_slot_start_str = current_time.isoformat()  
+
+            # Mark it as booked if it exists in occupied_times  
+            blocked = full_slot_start_str in occupied_times  
+            available_time_slots.append((f"{slot_start_str} - {slot_end_str}", full_slot_start_str, blocked))  
+
+            # Increment the time by the average visit time  
+            current_time += timedelta(minutes=avg_visit_time)  
+
+        return available_time_slots
+
+
     def post(self, request, *args, **kwargs):
         # Manually set the object since we're in a POST request
         self.object = self.get_object()

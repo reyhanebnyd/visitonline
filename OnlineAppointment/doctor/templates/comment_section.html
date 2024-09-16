@@ -3,20 +3,20 @@
     {% csrf_token %}  
     <div class="form-group">  
         {{ comment_form.comment_text.label_tag }}  
-        {{ comment_form.comment_text | add_class:"form-control" }}  <!-- Use a class for Bootstrap styling -->  
+        {{ comment_form.comment_text }}  {# No need to call add_class, as it's already applied #}  
         {% if comment_form.comment_text.errors %}  
             <div class="text-danger">  
-                {{ comment_form.comment_text.errors }}  <!-- Display any error messages -->  
+                {{ comment_form.comment_text.errors }}  
             </div>  
         {% endif %}  
     </div>  
 
     <div class="form-group">  
         {{ comment_form.rating.label_tag }}  
-        {{ comment_form.rating | add_class:"form-control" }}  <!-- Use a class for Bootstrap styling -->  
+        {{ comment_form.rating }}  {# Same here, no need to call add_class #}  
         {% if comment_form.rating.errors %}  
             <div class="text-danger">  
-                {{ comment_form.rating.errors }}  <!-- Display any error messages -->  
+                {{ comment_form.rating.errors }}  
             </div>  
         {% endif %}  
     </div>  
@@ -24,7 +24,6 @@
     <button type="submit" class="btn btn-primary">Submit Comment</button>  
 </form>  
 
-<!-- Display general error message if exists -->  
 {% if error_message %}  
     <div class="alert alert-danger mt-3">{{ error_message }}</div>  
 {% endif %}  
@@ -33,7 +32,7 @@
     <h3>Comments</h3>  
     {% for comment in comments %}  
         <div class="comment mb-3 p-3 border rounded">  
-            <strong>{{ comment.user.username }}</strong>  <!-- Assuming user has a username field -->  
+            <strong>{{ comment.user.username }}</strong>  
             <small class="text-muted">{{ comment.created_at.date }}</small>  
             <div class="rating">  
                 Rating: <strong>{{ comment.rating }}</strong>  
