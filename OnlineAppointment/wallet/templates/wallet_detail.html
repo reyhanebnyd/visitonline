@@ -7,7 +7,7 @@
 </head>  
 <body>  
     <h1>Wallet Details</h1>  
-    <p>User: {{ wallet.id.user.username }}</p>  
+    <p>User: {{ request.user.username }}</p>  
     <p>Balance: ${{ wallet.balance }}</p>  
 
     <a href="{% url 'add_balance' %}">Add Balance</a>  

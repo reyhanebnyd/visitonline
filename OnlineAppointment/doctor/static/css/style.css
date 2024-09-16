@@ -1,0 +1,17 @@
+.available {  
+    background-color: #28a745; /* Green */  
+    color: white;  
+    cursor: pointer;  
+}  
+.booked {  
+    background-color: #dc3545; /* Red */  
+    color: white;  
+    cursor: not-allowed; /* Change cursor for booked slots */  
+}  
+.selected {  
+    background-color: #007bff; /* Blue */  
+    color: white;  
+}  
+.reserve-button {  
+    display: none; /* Initially hidden */  
+}  
