@@ -18,6 +18,8 @@
     </form>
     <p>Don't have an account? <a href="{% url 'signup' %}">Sign Up</a></p>
     <p>log in with otp <a href="{% url 'otp' %}">log in with otp</a></p>
+    <p>log in with google <a href="{% url 'social:begin' 'google-oauth2' %}">login with google</a></p>
+
 
 
 {% endblock %}

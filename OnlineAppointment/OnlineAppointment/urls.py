@@ -24,4 +24,5 @@ urlpatterns = [
     path('', include('doctor.urls')),
     path('', include('wallet.urls')),
     path('', include('user.urls')),
+    path('', include('social_django.urls', namespace='social')),
 ]
