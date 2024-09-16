@@ -12,6 +12,6 @@
     <p>Doctor: {{ reservation.id_D.name }}</p>
     <p>Time Slot: {{ reservation.accessdate }}</p>
     <p>Please cancel your existing reservation if you wish to book a new one.</p>
-    <a href="{% url 'cancel_reservation' reservation.id %}">Cancel Reservation</a>  <!-- Link to cancel reservation -->
+    <a href="{% url 'cancel_reservation' reservation.id %}">Cancel Reservation</a> 
 </body>
 </html>

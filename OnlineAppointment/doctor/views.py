@@ -7,6 +7,7 @@ from django.shortcuts import render, redirect,get_object_or_404
 from django.views.generic import CreateView, ListView, DetailView
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Avg
 
 class Add_doctor(CreateView):
     model = Doctor
@@ -142,12 +143,31 @@ class DoctorDetailView(LoginRequiredMixin, DetailView):
         context["available_slots"] = available_slots
         context["occupied_times"] = occupied_times  # This can be used in the template
         context["doctor"] = doctor1
+        #-------------------------------------------------------
+        #this part is to handle comments
+        context['comments'] = Comment.objects.filter(doctor=self.object)  
+
+        average_rating = (  
+            Comment.objects.filter(doctor=self.object)  
+            .aggregate(Avg('rating'))['rating__avg']  
+        )  
+        context['average_rating'] = average_rating 
 
         return context
     def post(self, request, *args, **kwargs):
         # Manually set the object since we're in a POST request
         self.object = self.get_object()
+        has_appointment = Fulltimes.objects.filter(  
+        id_U=request.user.appuser,  # Assuming request.user is an instance of Appuser  
+        id_D=self.object,    # The doctor object  
+        ).exists()  
 
+        if not has_appointment:  
+            # If the user does not have an appointment, return an error message  
+            context = self.get_context_data()  
+            context['comment_form'] = CommentForm(request.POST)  # Show form with errors  
+            context['error_message'] = "You must have an appointment with this doctor to leave a comment."  
+            return self.render_to_response(context)
         # Process the comment form
         comment_form = CommentForm(request.POST)
         if comment_form.is_valid():

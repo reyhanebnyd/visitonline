@@ -1,3 +1,4 @@
+{% load my_filters %}
 <!DOCTYPE html>  
 <html lang="en">  
 <head>  
@@ -31,6 +32,15 @@
         <p class="text-center"><strong>Career:</strong> {{ doctor.career }}</p>  
         <p class="text-center"><strong>Price:</strong> ${{ doctor.price }}</p>  
 
+        <!-- Display Average Rating -->  
+        <h4 class="text-center">  
+            Average Rating:   
+            {% if average_rating %}  
+                <strong>{{ average_rating|floatformat:1 }}</strong>  
+            {% else %}  
+                <strong>No ratings yet.</strong>  
+            {% endif %}  
+        </h4>  
         <h2>Available Time Slots</h2>  
         <div class="row">  
             {% for day, slots in available_slots.items %}  
@@ -91,26 +101,7 @@
             }  
         }
     </script> 
-    <form method="POST">
-        {% csrf_token %}
-        <div class="form-group">
-            {{ comment_form.comment_text.label_tag }}
-            {{ comment_form.comment_text }}
-        </div>
-        <div class="form-group">
-            {{ comment_form.rating.label_tag }}
-            {{ comment_form.rating }}
-        </div>
-        <button type="submit" class="btn btn-primary">Submit Comment</button>
-    </form>
-    {% for comment in comments %}
-    {{ comment.user }}
-    {{ comment.created_at.date }}
-    |{{ comment.rating }}|
-    <p>----------</p>
-    {{ comment.comment_text }}
-    <p>***********</p>
-    <br>
-    {% endfor %}
+     
+    {% include "comment_section.html" with comment_form=comment_form comments=comments %}
 </body>  
 </html>
