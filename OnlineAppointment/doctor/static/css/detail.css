@@ -7,13 +7,13 @@ body {
 
 /* Styling for the available and booked slots */
 .available {
-    background-color: #28a745; /* Green for available slots */
-    color: green;
+    background-color: #28a745 !important; /* Green for available slots */
+    color: white;
     cursor: pointer; /* Pointer cursor to indicate interactivity */
 }
 
 .booked {
-    background-color: #dc3545; /* Red for booked slots */
+    background-color: #dc3545 !important; /* Red for booked slots */
     color: white;
     cursor: not-allowed; /* Not-allowed cursor for booked slots */
 }
@@ -40,4 +40,8 @@ body {
     border-radius: 0.25rem;
     margin-bottom: 1rem;
     background-color: #fff;
+}
+
+.list-group-item {
+    background-color: inherit;
 }
