@@ -26,6 +26,9 @@
                         <a class="nav-link" href="\wallet">Wallet</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="\reservations">Reservations</a>
+                    </li>
+                    <li class="nav-item">
                         <form method="POST" action="{% url 'logout' %}">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-link nav-link" style="color:white;">Logout</button>
