@@ -1,0 +1,90 @@
+/* detail.css */
+
+/* Ensure the page uses a clean layout */
+body {
+    background-color: #f8f9fa; /* Light grey background for a soft look */
+    font-family: Arial, sans-serif; /* Use a clean font for readability */
+}
+
+/* Container for the doctor details */
+.container {
+    margin-top: 20px;
+}
+
+/* Styling for the available and booked slots */
+.available, .booked, .selected {
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    padding: 10px;
+    font-size: 16px;
+    text-align: center;
+}
+
+/* Styling for available slots */
+.available {
+    background-color: #28a745; /* Green for available slots */
+}
+
+/* Styling for booked slots */
+.booked {
+    background-color: #dc3545; /* Red for booked slots */
+    cursor: not-allowed; /* Not-allowed cursor for booked slots */
+}
+
+/* Styling for selected slot */
+.selected {
+    background-color: #007bff; /* Blue for the selected slot */
+}
+
+/* Hide the reserve button initially */
+.reserve-button {
+    display: none;
+    margin-top: 20px;
+}
+
+/* Styling for the reserve button */
+.reserve-button {
+    background-color: #007bff; /* Blue for reserve button */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+/* Change button background color on hover */
+.reserve-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Style for reservation form */
+#reservationForm {
+    margin-top: 20px;
+}
+
+/* Style for form inputs */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+/* Adjust the spacing and alignment of comments */
+.comment {
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    margin-bottom: 1rem;
+    background-color: #fff;
+}
+
+/* Style for the comments section */
+.comments-section {
+    margin-top: 20px;
+}
+
+/* Ensure list-group items have some spacing */
+.list-group-item {
+    margin-bottom: 10px;
+}

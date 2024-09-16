@@ -1,117 +1,90 @@
+{% extends "base1.html" %}
+{% load static %}
 
-{% extends "base.html" %}
+{% block title %}Doctor List{% endblock %}
+
 {% block head %}
-<meta charset="UTF-8">  
-<meta name="viewport" content="width=device-width, initial-scale=1.0">  
-<title>Doctor List</title>  
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">  
-{% endblock head %}
+    <!-- Additional CSS for this page -->
+    <link rel="stylesheet" href="{% static 'css/doctor-list.css' %}">
+{% endblock %}
+
 {% block content %}
-<body class="bg-gray-100">  
-    <form method="GET">
-        <!-- Loop through each field in the filter_form -->
+<div class="container mx-auto mt-4 bg-gray-100 p-6">
+    <h1 class="text-3xl font-bold mb-6 text-center">List of Doctors</h1>
+
+    <!-- Search form -->
+    <form class="form-inline mb-4" action="{% url 'doctor-list' %}" method="GET">
+        <div class="form-group mx-sm-3 mb-2">
+            <label for="search_term" class="sr-only">Search</label>
+            <input type="text" class="form-control" id="search_term" name="search_term" 
+                   placeholder="Search by name or specialty" value="{{ request.GET.search_term }}">
+        </div>
+        <button type="submit" class="btn btn-primary mb-2">Search</button>
+    </form>
+
+    <!-- Filter form (Range Slider) -->
+    <form method="GET" class="mb-6">
+        {% csrf_token %}
+        <!-- Include search_term to maintain search state -->
+        <input type="hidden" name="search_term" value="{{ request.GET.search_term }}">
+    
+        <!-- Filter form fields -->
         {% for field in filter_form %}
         <div class="form-group">
             {% if field.name == 'pricema' %}
-            <div class="wrapper">
-                <fieldset class="filter-price">
-                  <div class="price-field">
-                    <input name='pricemi'type="range" min="100" max="500" value="100" id="lower" />
-                    <input name='pricema' type="range" min="100" max="500" value="500" id="upper" />
-                  </div>
-              
-                  <div class="price-wrap">
-                    <span class="price-title">FILTER</span>
-                    <div class="price-wrap-1">
-                      <input id="one" readonly />
-                      <label for="one">$</label>
-                    </div>
-                    <div class="price-wrap_line">-</div>
-                    <div class="price-wrap-2">
-                      <input id="two" readonly />
-                      <label for="two">$</label>
-                    </div>
-                  </div>
-                </fieldset>
-              </div>
-            {% elif field.name == 'pricemi'  %}
+            <label for="pricemi">Min Price:</label>
+            <input type="number" id="pricemi" name="pricemi" min="100" max="500" value="{{ filter_form.pricemi.value|default:100 }}" class="form-control" />
+            
+            <label for="pricema">Max Price:</label>
+            <input type="number" id="pricema" name="pricema" min="100" max="500" value="{{ filter_form.pricema.value|default:500 }}" class="form-control" />
+            {% elif field.name == 'pricemi' %}
+            <!-- Skip pricemi as it's handled with pricema -->
             {% else %}
             <label for="{{ field.id_for_label }}">{{ field.label_tag }}</label>
             {{ field }}
             {% endif %}
-            <div class="help-text">{{ field.help_text }}</div>
             {% if field.errors %}
-            <div class="error">
+            <div class="text-red-500">
                 {{ field.errors }}
             </div>
             {% endif %}
         </div>
         {% endfor %}
-        
-        <button type="submit">Filter</button>
+        <button type="submit" class="btn btn-primary">Filter</button>
     </form>
-    <div class="container mx-auto p-4">  
-        <h1 class="text-3xl font-bold mb-6 text-center">List of Doctors</h1>  
-        
-        <div class="overflow-x-auto shadow-lg rounded-lg">  
-            <table class="min-w-full bg-white border border-gray-300 rounded-lg">  
-                <thead>  
-                    <tr class="bg-gray-200 text-gray-700">  
-                        <th class="py-3 px-4 border-b">Name</th>  
-                        <th class="py-3 px-4 border-b">Career</th>  
-                        <th class="py-3 px-4 border-b">Price</th>  
-                    </tr>  
-                </thead>  
-                <tbody>  
-                    {% for doctor in doctors %}  
-                    <tr class="hover:bg-gray-100 cursor-pointer" onclick="location.href='{% url 'doctor-detail' doctor.id %}'">  
-                        <td class="py-3 px-4 border-b">{{ doctor.name }}</td>  
-                        <td class="py-3 px-4 border-b">{{ doctor.career }}</td>  
-                        <td class="py-3 px-4 border-b">${{ doctor.price }}</td>  
-                    </tr>  
-                    {% empty %}  
-                    <tr>  
-                        <td colspan="3" class="py-3 px-4 text-center">No doctors available.</td>  
-                    </tr>  
-                    {% endfor %}  
-                </tbody>  
-            </table>  
-        </div>  
-    </div>  
-</body>
-<script>
-    var lowerSlider = document.querySelector('#lower');
-    var  upperSlider = document.querySelector('#upper');
-    
-    document.querySelector('#two').value=upperSlider.value;
-    document.querySelector('#one').value=lowerSlider.value;
-    
-    var  lowerVal = parseInt(lowerSlider.value);
-    var upperVal = parseInt(upperSlider.value);
-    
-    upperSlider.oninput = function () {
-        lowerVal = parseInt(lowerSlider.value);
-        upperVal = parseInt(upperSlider.value);
-    
-        if (upperVal < lowerVal + 4) {
-            lowerSlider.value = upperVal - 4;
-            if (lowerVal == lowerSlider.min) {
-            upperSlider.value = 4;
-            }
-        }
-        document.querySelector('#two').value=this.value
-    };
-    
-    lowerSlider.oninput = function () {
-        lowerVal = parseInt(lowerSlider.value);
-        upperVal = parseInt(upperSlider.value);
-        if (lowerVal > upperVal - 4) {
-            upperSlider.value = lowerVal + 4;
-            if (upperVal == upperSlider.max) {
-                lowerSlider.value = parseInt(upperSlider.max) - 4;
-            }
-        }
-        document.querySelector('#one').value=this.value
-    };
-</script> 
-{% endblock content %}
+    <!-- Doctor list table -->
+    <div class="overflow-x-auto shadow-lg rounded-lg mt-6">
+        <table class="min-w-full bg-white border border-gray-300 rounded-lg">
+            <thead>
+                <tr class="bg-gray-200 text-gray-700">
+                    <th class="py-3 px-4 border-b">Name</th>
+                    <th class="py-3 px-4 border-b">Career</th>
+                    <th class="py-3 px-4 border-b">Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for doctor in doctors %}
+                <tr class="hover:bg-gray-100 cursor-pointer" onclick="location.href='{% url 'doctor-detail' doctor.id %}'">
+                    <td class="py-3 px-4 border-b">{{ doctor.name }}</td>
+                    <td class="py-3 px-4 border-b">{{ doctor.career }}</td>
+                    <td class="py-3 px-4 border-b">${{ doctor.price }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="py-3 px-4 text-center">No doctors available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+    <!-- Add the footer here, or keep the default footer from base.html -->
+{% endblock %}
+
+{% block script %}
+    <!-- Include JavaScript specific to this page -->
+    <script src="{% static 'js/doctor-list.js' %}"></script>
+{% endblock %}

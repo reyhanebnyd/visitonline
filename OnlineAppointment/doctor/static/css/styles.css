@@ -1,0 +1,17 @@
+/* Override Bootstrap link styles */
+.navbar .nav-link {
+    color: black !important; /* Ensure the color is black */
+    text-decoration: none; /* Remove underline */
+}
+
+.navbar .nav-link:hover {
+    color: white;
+    background-color: #0056b3; /* Background color on hover */
+}
+
+/* Style for buttons within the navbar */
+.navbar .btn-link {
+    color: black !important; /* Override inline styles */
+}
+
+

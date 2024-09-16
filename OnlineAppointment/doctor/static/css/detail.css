@@ -1,0 +1,43 @@
+/* detail.css */
+
+/* Ensure the page uses a clean layout */
+body {
+    background-color: #f8f9fa; /* Light grey background for a soft look */
+}
+
+/* Styling for the available and booked slots */
+.available {
+    background-color: #28a745; /* Green for available slots */
+    color: white;
+    cursor: pointer; /* Pointer cursor to indicate interactivity */
+}
+
+.booked {
+    background-color: #dc3545; /* Red for booked slots */
+    color: white;
+    cursor: not-allowed; /* Not-allowed cursor for booked slots */
+}
+
+.selected {
+    background-color: #007bff; /* Blue for the selected slot */
+    color: white;
+}
+
+/* Hide the reserve button initially */
+.reserve-button {
+    display: none;
+}
+
+/* Ensure form elements have consistent styling */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+/* Adjust the spacing and alignment of comments */
+.comment {
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    margin-bottom: 1rem;
+    background-color: #fff;
+}

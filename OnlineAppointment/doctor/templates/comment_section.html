@@ -1,0 +1,48 @@
+{% extends "base1.html" %}
+{% load static %}
+<form method="POST" class="mb-4">  
+    {% csrf_token %}  
+    <div class="form-group">  
+        {{ comment_form.comment_text.label_tag }}  
+        {{ comment_form.comment_text }}  <!-- Use a class for Bootstrap styling -->  
+        {% if comment_form.comment_text.errors %}  
+            <div class="text-danger">  
+                {{ comment_form.comment_text.errors }}  <!-- Display any error messages -->  
+            </div>  
+        {% endif %}  
+    </div>  
+
+    <div class="form-group">  
+        {{ comment_form.rating.label_tag }}  
+        {{ comment_form.rating }}  <!-- Use a class for Bootstrap styling -->  
+        {% if comment_form.rating.errors %}  
+            <div class="text-danger">  
+                {{ comment_form.rating.errors }}  <!-- Display any error messages -->  
+            </div>  
+        {% endif %}  
+    </div>  
+
+    <button type="submit" class="btn btn-primary">Submit Comment</button>  
+</form>  
+
+<!-- Display general error message if exists -->  
+{% if error_message %}  
+    <div class="alert alert-danger mt-3">{{ error_message }}</div>  
+{% endif %}  
+
+<div class="comments-section">  
+    <h3>Comments</h3>  
+    {% for comment in comments %}  
+        <div class="comment mb-3 p-3 border rounded">  
+            <strong>{{ comment.user.username }}</strong>  <!-- Assuming user has a username field -->  
+            <small class="text-muted">{{ comment.created_at.date }}</small>  
+            <div class="rating">  
+                Rating: <strong>{{ comment.rating }}</strong>  
+            </div>  
+            <p class="mt-2">{{ comment.comment_text }}</p>  
+            <hr>  
+        </div>  
+    {% empty %}  
+        <p>No comments yet.</p>  
+    {% endfor %}  
+</div>
