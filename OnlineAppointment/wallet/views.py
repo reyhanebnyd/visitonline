@@ -2,13 +2,16 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.core.mail import send_mail  
 from django.conf import settings  
 from django.contrib import messages  
-from doctor.models import Fulltimes
+from doctor.models import Fulltimes, Doctor
+from wallet.models import Wallet
 from user.models import Appuser
 from django.core.exceptions import ObjectDoesNotExist  
 from django.contrib.auth.decorators import login_required  
 from datetime import datetime
 from django.http import HttpResponse
-
+from .forms import AddBalanceForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import DetailView
 @login_required  
 def payment_view(request):  
     if request.method == 'GET':  
@@ -22,27 +25,36 @@ def payment_view(request):
 
     if request.method == 'POST':  
         slot = request.POST.get('slot') 
-         
+        slot_datetime = datetime.fromisoformat(slot) 
         doctor_id = request.POST.get('doctor_id')  
+        doctor = Doctor.objects.get(id=doctor_id)  
+        doctor_price = doctor.price  
         
-        paid = True 
+        try:
+            wallet = Wallet.objects.get(uid_id=request.user.appuser)  # Adjust based on your Wallet model  
+        except:
+            Wallet.objects.create(uid = request.user.appuser)
+        user_balance = wallet.balance  
+        if user_balance >= doctor_price:  
         
-        slot_datetime = datetime.fromisoformat(slot)
-        
-        if paid:  
             reservation = Fulltimes.objects.create(  
                 id_U=request.user.appuser,  
                 id_D_id=doctor_id,  
                 accessdate=slot_datetime,  
             )  
-
               
-            #send_payment_success_email(request.user.email, reservation)  
+            wallet.balance -= doctor_price  
+            wallet.save()  
 
-              
-              
-            return HttpResponse("Success")  
+            send_payment_success_email(request.user.email, reservation)  
 
+            return render(request, 'success.html', {'reservation': reservation})  
+        else:  
+              
+            return render(request, 'fail.html', {  
+                'message': "Insufficient balance. Please add to your wallet.",  
+                'wallet_detail_url': '/wallet/'  
+            })  
     return render(request, 'payment.html', {'slot': slot, 'doctor_id': doctor_id})  
 
 def send_payment_success_email(to_email, reservation):  
@@ -54,11 +66,56 @@ def send_payment_success_email(to_email, reservation):
 
 @login_required
 def cancel_reservation(request, reservation_id):
-    # Get the reservation object
+   
     reservation = get_object_or_404(Fulltimes, id=reservation_id, id_U=request.user.appuser)
     
-    # Delete the reservation
+    doctor = get_object_or_404(Doctor, id=reservation.id_D_id)   
+    refund_amount = doctor.price  
+
+    wallet = get_object_or_404(Wallet, uid_id=request.user.appuser)   
+
+     
+    wallet.balance += refund_amount  
+    wallet.save()  
+
     reservation.delete()
     
-    # Redirect to a confirmation page or any other page
+    
     return redirect('reservation_canceled')     
+
+class WalletDetailView(LoginRequiredMixin, DetailView):  
+    model = Wallet  
+    template_name = 'wallet_detail.html'  
+    context_object_name = 'wallet'  
+
+    def get_object(self, queryset=None):  
+        wallet = Wallet.objects.get(uid=self.request.user.appuser)  
+        return wallet  
+
+@login_required  
+def add_balance(request):  
+     
+    wallet = get_object_or_404(Wallet, uid=request.user.appuser)  
+
+    if request.method == 'POST':  
+        form = AddBalanceForm(request.POST)  
+        if form.is_valid():  
+            amount = form.cleaned_data['amount']  
+            wallet.balance += amount  
+            wallet.save()   
+            return redirect('wallet_detail')   
+    else:  
+        form = AddBalanceForm()  
+
+    context = {  
+        'form': form,  
+        'wallet': wallet,  
+    }  
+    return render(request, 'add_balance.html', context)   
+
+@login_required  
+def reservations_page(request):  
+     
+    reservations = Fulltimes.objects.filter(id_U=request.user.appuser)  
+    
+    return render(request, 'reservations.html', {'reservations': reservations})          

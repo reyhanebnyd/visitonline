@@ -1,0 +1,20 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Payment Successful</title>  
+</head>  
+<body>  
+    <h1>Payment Successful</h1>  
+    <p>Your reservation has been made successfully!</p>  
+    <p>Reservation Details:</p>  
+    <ul>  
+        <li>Doctor ID: {{ reservation.id_D_id }}</li>  
+        <li>Reservation Time: {{ reservation.accessdate }}</li>  
+    </ul>  
+    <p>Thank you for your payment!</p>  
+
+    <a href="{% url "doctor-list" %}">Go to doctor's list</a>
+</body>  
+</html>

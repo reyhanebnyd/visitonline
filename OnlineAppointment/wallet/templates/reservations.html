@@ -1,0 +1,37 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Your Reservations</title>  
+</head>  
+<body>  
+    <h1>Your Reservations</h1>  
+
+    {% if reservations %}  
+        <table>  
+            <tr>  
+                <th>Doctor Name</th>  
+                <th>Reservation Date and Time</th>  
+                <th>Action</th>  
+            </tr>  
+            {% for reservation in reservations %}  
+                <tr>  
+                    <td>{{ reservation.id_D_name }}</td>  
+                    <td>{{ reservation.accessdate }}</td>  
+                    <td>  
+                        <form action="{% url 'cancel_reservation' reservation.id %}" method="POST">  
+                            {% csrf_token %}  
+                            <button type="submit">Cancel</button>  
+                        </form>  
+                    </td>  
+                </tr>  
+            {% endfor %}  
+        </table>  
+    {% else %}  
+        <p>You have no reservations.</p>  
+    {% endif %}  
+    
+    <a href="/doctor-list">Go to Doctor List</a>  
+</body>  
+</html>
