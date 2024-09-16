@@ -19,7 +19,7 @@ body {
 }
 
 .selected {
-    background-color: #007bff; /* Blue for the selected slot */
+    background-color: #007bff !important; /* Blue for the selected slot */
     color: white;
 }
 
