@@ -1,0 +1,60 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <title>Available Time Slots for {{ doctor.name }}</title>  
+    <style>  
+        .available {  
+            background-color: #28a745; /* Green */  
+            color: white;  
+            cursor: pointer;  
+            padding: 10px 15px;  
+            margin: 5px;  
+            border: none;  
+            border-radius: 5px;  
+        }  
+        .booked {  
+            background-color: #dc3545; /* Red */  
+            color: white;  
+            cursor: not-allowed; /* Change cursor for booked slots */  
+            padding: 10px 15px;  
+            margin: 5px;  
+            border: none;  
+            border-radius: 5px;  
+        }  
+        .reserve-button {  
+            display: inline-block; /* Show reserve button */  
+            margin-top: 10px;  
+        }  
+    </style>  
+</head>  
+<body>  
+    <h1>Available Time Slots for {{ doctor.name }}</h1>  
+    <h2>Date: {{ date|date:"Y-m-d" }}</h2>  
+
+    {% if available_slots %}  
+        <h3>Available Time Slots:</h3>  
+        <ul style="list-style-type: none; padding: 0;">  
+            {% for slot in available_slots %}  
+                {% with slot_text=slot.0 slot_start=slot.1 blocked=slot.2 %}  
+                    <li>  
+                        {% if blocked %}  
+                            <button class="booked" disabled>{{ slot_text }}</button>  
+                        {% else %}  
+                            <button class="available" onclick="document.getElementById('reserve-{{ slot_start }}').style.display='inline-block';">{{ slot_text }}</button>  
+                            <form id="reserve-{{ slot_start }}" action="{% url 'payment' doctor_id=doctor.id slot=slot.isoformat %}" method="POST" class="reserve-button" style="display: none;">  
+                                {% csrf_token %}  
+                                <button type="submit" class="reserve-button">Reserve</button>  
+                            </form>  
+                        {% endif %}  
+                    </li>  
+                {% endwith %}  
+            {% endfor %}  
+        </ul>  
+    {% else %}  
+        <p>No available time slots for this date.</p>  
+    {% endif %}  
+
+    <a href="{% url 'doctor_detail' doctor.id %}">Back to Doctor's Availability</a>  
+</body>  
+</html>

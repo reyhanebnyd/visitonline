@@ -1,118 +1,27 @@
-{% load my_filters %}  
 <!DOCTYPE html>  
 <html lang="en">  
 <head>  
     <meta charset="UTF-8">  
     <meta name="viewport" content="width=device-width, initial-scale=1.0">  
     <title>{{ doctor.name }} Details</title>  
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">  
-    <style>  
-        .available {  
-            background-color: #28a745; /* Green */  
-            color: white;  
-            cursor: pointer;  
-        }  
-        .booked {  
-            background-color: #dc3545; /* Red */  
-            color: white;  
-            cursor: not-allowed; /* Change cursor for booked slots */  
-        }  
-        .selected {  
-            background-color: #007bff; /* Blue */  
-            color: white;  
-        }  
-        .reserve-button {  
-            display: none; /* Initially hidden */  
-        }  
-        .time-slots {  
-            display: none; /* Initially hidden */  
-            margin-top: 10px;  
-        }  
-    </style>  
 </head>  
 <body>  
     <div class="container my-5">  
         <h1 class="text-center">{{ doctor.name }}</h1>  
         <p class="text-center"><strong>Career:</strong> {{ doctor.career }}</p>  
         <p class="text-center"><strong>Price:</strong> ${{ doctor.price }}</p>  
-
-        <!-- Display Average Rating -->  
-        <h4 class="text-center">  
-            Average Rating:   
-            {% if average_rating %}  
-                <strong>{{ average_rating|floatformat:1 }}</strong>  
-            {% else %}  
-                <strong>No ratings yet.</strong>  
-            {% endif %}  
-        </h4>  
-
-        <h2>Available Days</h2>  
-        <div class="row">  
-            {% for date, details in available_days.items %}  
-            <div class="col-md-4 mb-3">  
-                <h5 onclick="toggleTimeSlots('{{ date }}', this)">{{ details.name }} - {{ date }}</h5>  
-                <div class="time-slots" id="slots-{{ date }}">  
-                    <ul class="list-group">  
-                        {% for slot in details.slots %}  
-                            {% if slot.2 %}  {# Check if the slot has a booked flag #}  
-                                <li class="list-group-item booked">{{ slot.0 }}</li>  {# Booked slot #}  
-                            {% else %}  
-                                <li class="list-group-item available" onclick="reserveTime('{{ slot.1 }}', this)">{{ slot.0 }}</li>  {# Available slot #}  
-                            {% endif %}  
-                        {% endfor %}  
-                    </ul>  
-                </div>  
-            </div>  
+        <p>Average Rating: {{ average_rating }}</p>
+        <h1>{{ doctor.name }}'s Availability</h1>  
+        <ul>  
+            {% for date in available_days %}  
+                <li>  
+                    <a href="{% url 'time_slots' doctor.id date|date:'Y-m-d' %}">  
+                        {{ date|date:"Y-m-d" }}  
+                    </a>  
+                </li>  
             {% endfor %}  
-        </div>  
-
-        <form id="reservationForm" method="POST" action="{% url 'payment' %}">  
-            {% csrf_token %}  
-            <input type="hidden" id="slotInput" name="slot">  
-            <input type="hidden" id="doctorIdInput" name="doctor_id" value="{{ doctor.id }}">  
-        </form>  
-
-        <div class="text-center">  
-            <button id="reserveButton" class="btn btn-primary reserve-button" onclick="confirmReservation()">Reserve Time</button>  
-        </div>  
-    </div>  
-
-    <script>  
-        let selectedSlot = null;  
-
-        function toggleTimeSlots(date, headerElement) {  
-            const slotsDiv = document.getElementById(`slots-${date}`);  
-            if (slotsDiv.style.display === "none") {  
-                slotsDiv.style.display = "block";  
-            } else {  
-                slotsDiv.style.display = "none";  
-            }  
-        }  
-
-        function reserveTime(full_slot_start, element) {   
-            if (selectedSlot) {  
-                document.querySelector(`.selected`).classList.remove('selected');  
-            }  
-            selectedSlot = full_slot_start;  
-            // Highlight the selected slot  
-            element.classList.add('selected');  
-            // Show the reserve button  
-            document.getElementById("reserveButton").style.display = 'block';  
-        }  
-
-        function confirmReservation() {  
-            if (selectedSlot) {  
-                // Set the value of the hidden input with the selected slot  
-                document.getElementById('slotInput').value = selectedSlot;  
-                // Submit the form  
-                document.getElementById('reservationForm').submit();  
-                // The following line is redundant since the form is being submitted, feel free to keep or remove it based on your needs  
-                window.location.href = `/payment?slot=${encodeURIComponent(selectedSlot)}&doctor_id=${encodeURIComponent(document.getElementById('doctorIdInput').value)}`;  
-            } else {  
-                alert("Please select a time slot to reserve.");  
-            }  
-        }  
-    </script>   
+        </ul>      
+        
      
     {% include "comment_section.html" with comment_form=comment_form comments=comments %}  
 </body>  

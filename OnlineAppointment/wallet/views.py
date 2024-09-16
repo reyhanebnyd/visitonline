@@ -15,8 +15,6 @@ from django.views.generic import DetailView
 @login_required  
 def payment_view(request):  
     if request.method == 'GET':  
-        slot = request.GET.get('slot')  
-        doctor_id = request.GET.get('doctor_id') 
         try:  
             existing_reservation = Fulltimes.objects.get(id_U=request.user.appuser, id_D_id=doctor_id)  
             return render(request, 'already_reserved.html', {'reservation': existing_reservation})  
@@ -24,18 +22,14 @@ def payment_view(request):
             return render(request, 'payment.html', {'slot': slot, 'doctor_id': doctor_id})  
 
     if request.method == 'POST':  
-        slot = request.POST.get('slot') 
-        slot_datetime = datetime.fromisoformat(slot) 
-        doctor_id = request.POST.get('doctor_id')  
+        slot_datetime = datetime.fromisoformat(slot)  # Note: slot is already passed to view  
         doctor = Doctor.objects.get(id=doctor_id)  
         doctor_price = doctor.price  
         
-        
-        wallet = Wallet.objects.get(id_id=request.user.appuser)  # Adjust based on your Wallet model  
+        wallet = Wallet.objects.get(id_id=request.user.appuser)  
         user_balance = wallet.balance  
         
         if user_balance >= doctor_price:  
-              
             reservation = Fulltimes.objects.create(  
                 id_U=request.user.appuser,  
                 id_D_id=doctor_id,  
@@ -49,12 +43,11 @@ def payment_view(request):
 
             return render(request, 'success.html', {'reservation': reservation})  
         else:  
-              
             return render(request, 'fail.html', {  
                 'message': "Insufficient balance. Please add to your wallet.",  
                 'wallet_detail_url': '/wallet/'  
             })  
-    return render(request, 'payment.html', {'slot': slot, 'doctor_id': doctor_id})  
+    return render(request, 'payment.html', {'slot': slot, 'doctor_id': doctor_id}) 
 
 def send_payment_success_email(to_email, reservation):  
     subject = 'Payment Confirmation'  

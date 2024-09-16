@@ -8,6 +8,7 @@ from django.views.generic import CreateView, ListView, DetailView
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Avg
+from django.views import View
 
 class Add_doctor(CreateView):
     model = Doctor
@@ -75,13 +76,8 @@ class DoctorDetailView(LoginRequiredMixin, DetailView):
         doctor = self.get_object()  
         access_dates = doctor.accessdate  
 
-        # Retrieve occupied dates  
-        occupied_times = Fulltimes.objects.filter(id_D=doctor).values_list(  
-            "accessdate", flat=True  
-        )  
-        occupied_times_str = set(occupied_times)  
-
-        available_days = {}  
+        # Create a list to hold the available days for the next month  
+        available_days = []  
         today = timezone.now().date()  
 
         # Define the range of dates (from today to a month ahead)  
@@ -98,24 +94,13 @@ class DoctorDetailView(LoginRequiredMixin, DetailView):
             6: "sunday",  
         }  
 
+        # Determine available days for the next month  
         for date in date_range:  
             weekday_name = week_days[date.weekday()]  
-            if weekday_name in access_dates and access_dates[weekday_name] != 'Off':
-                start_time_str, end_time_str = access_dates[weekday_name]  
-                start_time = datetime.strptime(start_time_str, "%H:%M").time()  
-                end_time = datetime.strptime(end_time_str, "%H:%M").time()  
-                
-                # Prepare available time slots for this date  
-                available_time_slots = self.get_available_time_slots(start_time, end_time, doctor, occupied_times_str)  
+            if weekday_name in access_dates and access_dates[weekday_name] != 'Off':  
+                available_days.append(date)  
 
-                # Only add to available_days if there are time slots  
-                if available_time_slots:  
-                    available_days[date] = {  
-                        'name': weekday_name,  
-                        'slots': available_time_slots  
-                    }  
-        context['available_days'] = available_days  
-        context['doctor'] = doctor    
+        context['available_days'] = available_days 
         #-------------------------------------------------------
         #this part is to handle comments
         context['comments'] = Comment.objects.filter(doctor=self.object)  
@@ -128,29 +113,7 @@ class DoctorDetailView(LoginRequiredMixin, DetailView):
 
         return context
 
-    def get_available_time_slots(self, start_time, end_time, doctor, occupied_times):  
-        avg_visit_time = int(doctor.avg_visit_time)  
-        available_time_slots = []  
-
-        # Start from the start_time until the end_time  
-        current_time = datetime.combine(timezone.now().date(), start_time)  
-        end_time_dt = datetime.combine(timezone.now().date(), end_time)  
-
-        while current_time + timedelta(minutes=avg_visit_time) <= end_time_dt:  
-            slot_start_str = current_time.strftime("%H:%M")  
-            slot_end_str = (current_time + timedelta(minutes=avg_visit_time)).strftime("%H:%M")  
-            full_slot_start_str = current_time.isoformat()  
-
-            # Mark it as booked if it exists in occupied_times  
-            blocked = full_slot_start_str in occupied_times  
-            available_time_slots.append((f"{slot_start_str} - {slot_end_str}", full_slot_start_str, blocked))  
-
-            # Increment the time by the average visit time  
-            current_time += timedelta(minutes=avg_visit_time)  
-
-        return available_time_slots
-
-
+    
     def post(self, request, *args, **kwargs):
         # Manually set the object since we're in a POST request
         self.object = self.get_object()
@@ -181,3 +144,124 @@ class DoctorDetailView(LoginRequiredMixin, DetailView):
         context = self.get_context_data()
         context['comment_form'] = comment_form  # Show form with errors
         return self.render_to_response(context)
+
+
+class TimeSlotsView(LoginRequiredMixin, View):  
+    login_url = '/login'  
+
+    def get(self, request, doctor_id, date):  
+        doctor = get_object_or_404(Doctor, pk=doctor_id)  
+        date_obj = datetime.strptime(date, '%Y-%m-%d').date()  
+
+        # Retrieve occupied slots  
+        occupied_times = Fulltimes.objects.filter(  
+            id_D=doctor,  
+            accessdate__date=date_obj  
+        ).values_list("accessdate", flat=True)  
+        occupied_times_str = set(occupied_times)  
+
+        # Get the weekday to retrieve access times  
+        week_days = {  
+            0: "monday",  
+            1: "tuesday",  
+            2: "wednesday",  
+            3: "thursday",  
+            4: "friday",  
+            5: "saturday",  
+            6: "sunday",  
+        }  
+        weekday_name = week_days[date_obj.weekday()]  
+
+        access_dates = doctor.accessdate  
+        if weekday_name in access_dates and access_dates[weekday_name] != 'Off':  
+            start_time_str, end_time_str = access_dates[weekday_name]  
+            start_time = datetime.strptime(start_time_str, "%H:%M").time()  
+            end_time = datetime.strptime(end_time_str, "%H:%M").time()  
+
+            # Use the shared method to get available time slots  
+            avg_visit_time = doctor.avg_visit_time
+            available_time_slots = get_available_time_slots(start_time, end_time, avg_visit_time, occupied_times_str)  
+
+            return render(request, 'time_slots.html', {  
+                'doctor': doctor,  
+                'date': date_obj,  
+                'available_slots': available_time_slots  
+            })  
+        
+        return render(request, 'time_slots.html', {  
+            'doctor': doctor,  
+            'date': date_obj,  
+            'available_slots': []  
+        })         
+
+class TimeSlotsView(LoginRequiredMixin, View):  
+    login_url = '/login'  
+
+    def get(self, request, doctor_id, date):  
+        doctor = get_object_or_404(Doctor, pk=doctor_id)  
+        date_obj = datetime.strptime(date, '%Y-%m-%d').date()  
+
+        # Retrieve occupied slots  
+        occupied_times = Fulltimes.objects.filter(  
+            id_D=doctor,  
+            accessdate__date=date_obj  
+        ).values_list("accessdate", flat=True)  
+        occupied_times_str = set(occupied_times)  
+
+        # Get the weekday to retrieve access times  
+        week_days = {  
+            0: "monday",  
+            1: "tuesday",  
+            2: "wednesday",  
+            3: "thursday",  
+            4: "friday",  
+            5: "saturday",  
+            6: "sunday",  
+        }  
+        weekday_name = week_days[date_obj.weekday()]  
+
+        access_dates = doctor.accessdate  
+        if weekday_name in access_dates and access_dates[weekday_name] != 'Off':  
+            start_time_str, end_time_str = access_dates[weekday_name]  
+            start_time = datetime.strptime(start_time_str, "%H:%M").time()  
+            end_time = datetime.strptime(end_time_str, "%H:%M").time()  
+
+            # Use the shared method to get available time slots  
+            avg_visit_time = doctor.avg_visit_time
+            available_time_slots = self.get_available_time_slots(start_time, end_time, avg_visit_time, occupied_times_str)  
+
+            return render(request, 'time_slots.html', {  
+                'doctor': doctor,  
+                'date': date_obj,  
+                'available_slots': available_time_slots  
+            })  
+        
+        return render(request, 'time_slots.html', {  
+            'doctor': doctor,  
+            'date': date_obj,  
+            'available_slots': []  
+        })        
+
+    def get_available_time_slots(self, start_time, end_time, avg_visit_time, occupied_times):  
+            avg_visit_time = int(avg_visit_time)  
+            available_time_slots = []  
+
+            # Start from the start_time until the end_time  
+            current_time = datetime.combine(timezone.now().date(), start_time)  
+            end_time_dt = datetime.combine(timezone.now().date(), end_time)  
+
+            while current_time + timedelta(minutes=avg_visit_time) <= end_time_dt:  
+                slot_start_str = current_time.strftime("%H:%M")  
+                slot_end_str = (current_time + timedelta(minutes=avg_visit_time)).strftime("%H:%M")  
+                full_slot_start_str = current_time.isoformat()  
+                full_slot_start_dt = datetime.fromisoformat(full_slot_start_str).replace(tzinfo=dt_timezone.utc)
+
+                # Mark it as booked if it exists in occupied_times  
+                blocked = full_slot_start_dt in occupied_times  
+                available_time_slots.append((f"{slot_start_str} - {slot_end_str}", full_slot_start_str, blocked))  
+
+                # Increment the time by the average visit time  
+                current_time += timedelta(minutes=avg_visit_time)  
+
+            return available_time_slots            
+        

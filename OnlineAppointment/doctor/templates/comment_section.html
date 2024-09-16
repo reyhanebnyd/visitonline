@@ -1,5 +1,4 @@
-{% load my_filters %}  
-<form method="POST" class="mb-4">  
+ <form method="POST" class="mb-4">  
     {% csrf_token %}  
     <div class="form-group">  
         {{ comment_form.comment_text.label_tag }}  
