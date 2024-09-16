@@ -8,7 +8,7 @@ body {
 /* Styling for the available and booked slots */
 .available {
     background-color: #28a745; /* Green for available slots */
-    color: white;
+    color: green;
     cursor: pointer; /* Pointer cursor to indicate interactivity */
 }
 
