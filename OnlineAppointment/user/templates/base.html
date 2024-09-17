@@ -168,6 +168,14 @@
                     {% csrf_token %}
                     <button type="submit">Logout</button>
                 </form>
+                <form action="{% url "reservations" %}" method="GET">
+                    {% csrf_token %}
+                    <button type='submit'>Reservations</button>
+                </form>
+                <form action="{% url "wallet_detail" %}" method="GET">
+                    {% csrf_token %}
+                    <button type='submit'>Wallet</button>
+                </form>
                 {% else %}
                 <form action="{% url "login" %}" method="GET">
                     {% csrf_token %}
@@ -178,6 +186,7 @@
                     <button type='submit'>Sign up</button>
                 </form>
                 {% endif %}
+
             </li>
         </ul>
     </nav> <div class="container">

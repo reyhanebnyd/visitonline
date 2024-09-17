@@ -47,8 +47,9 @@ class Edit_doctor(UserPassesTestMixin,UpdateView):
         return context
 
 
-class DoctorListView(ListView):
+class DoctorListView(LoginRequiredMixin, ListView):
     model = Doctor
+    login_url ='login/'
     template_name = "doctor_list.html"
     context_object_name = "doctors"
 

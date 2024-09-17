@@ -7,7 +7,12 @@
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">  
 {% endblock head %}
 {% block content %}
-<body class="bg-gray-100">  
+<body class="bg-gray-100"> 
+    {% if appuser.is_admin %}
+    <form action="{% url "adddoctor" %}" method="get">
+        <input type="submit" value='Add Doctor' class='btn btn-success'>
+    </form> 
+    {% endif %}
     <form method="GET">
         <!-- Loop through each field in the filter_form -->
         {% for field in filter_form %}

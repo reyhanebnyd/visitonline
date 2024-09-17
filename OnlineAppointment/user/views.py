@@ -8,17 +8,40 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Appuser
 import pyotp
+from django import forms
+
+class CustomUserCreationForm(UserCreationForm):
+    email = forms.EmailField(required=True)  # Add the email field
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password1', 'password2']
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data['email']
+        if commit:
+            user.save()
+        return user
+
+
 def signup(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            
+            # Check if an Appuser already exists for this user
+            if not Appuser.objects.filter(user=user).exists():
+                # Create an associated Appuser instance
+                Appuser.objects.create(user=user, email=user.email)
+            
             login(request, user)  # Automatically log in after signup
-            return redirect('doctor-list')  # Redirect to homepage after signup
+            return redirect('doctor-list')  # Redirect to the desired page
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
+    
     return render(request, 'signup.html', {'form': form})
-
 def print_otp_in_terminal(user):
     # Assuming user has an OTP secret
     
