@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>{{ doctor.name }} Details</title>  
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">  
+    <style>  
+        .available {  
+            background-color: #28a745; /* Green */  
+            color: white;  
+            cursor: pointer;  
+        }  
+        .booked {  
+            background-color: #dc3545; /* Red */  
+            color: white;  
+            cursor: not-allowed; /* Change cursor for booked slots */  
+        }  
+        .selected {  
+            background-color: #007bff; /* Blue */  
+            color: white;  
+        }  
+        .reserve-button {  
+            display: none; /* Initially hidden */  
+        }  
+    </style>  
+</head>  
+<body>  
+    <div class="container my-5">  
+        <h1 class="text-center">{{ doctor.name }}</h1>  
+        <p class="text-center"><strong>Career:</strong> {{ doctor.career }}</p>  
+        <p class="text-center"><strong>Price:</strong> ${{ doctor.price }}</p>  
+
+        <h2>Available Time Slots</h2>  
+        <div class="row">  
+            {% for day, slots in available_slots.items %}  
+            <div class="col-md-4 mb-3">  
+                <h5>{{ day }}</h5>  
+                <ul class="list-group">  
+                    {% if slots %}  
+                    {% for slot in slots %}  
+                    {% if slot.2 %}  {# Check if the slot has a booked flag #}  
+                    <li class="list-group-item booked">{{ slot.0 }}</li>  {# Booked slot #}  
+                    {% else %}  
+                    <li class="list-group-item available" onclick="reserveTime('{{ slot.1 }}', this)">{{ slot.0 }}</li>  {# Available slot #}  
+                    {% endif %}  
+                    {% endfor %}  
+                    {% else %}  
+                    <li class="list-group-item">No available times.</li>  
+                    {% endif %}  
+                </ul>  
+            </div>  
+            {% endfor %}  
+        </div>  
+
+        <form id="reservationForm" method="POST" action="{% url 'payment' %}">
+            {% csrf_token %}
+            <input type="hidden" id="slotInput" name="slot">
+            <input type="hidden" id="doctorIdInput" name="doctor_id" value="{{ doctor.id }}">
+        </form>
+
+        <div class="text-center">  
+            <button id="reserveButton" class="btn btn-primary reserve-button" onclick="confirmReservation()">Reserve Time</button>  
+        </div>  
+    </div>  
+
+    <script src='{% static "/js/doctor-details.js" %}'></script> 
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ comment_form.comment_text.label_tag }}
+            {{ comment_form.comment_text }}
+        </div>
+        <div class="form-group">
+            {{ comment_form.rating.label_tag }}
+            {{ comment_form.rating }}
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Comment</button>
+    </form>
+    {% for comment in comments %}
+    {{ comment.user }}
+    {{ comment.created_at.date }}
+    |{{ comment.rating }}|
+    <p>----------</p>
+    {{ comment.comment_text }}
+    <p>***********</p>
+    <br>
+    {% endfor %}
+</body>  
+</html>
