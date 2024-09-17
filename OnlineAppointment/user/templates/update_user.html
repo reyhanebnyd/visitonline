@@ -1,0 +1,28 @@
+<!-- update_user.html -->
+
+{% extends "base.html" %}
+
+{% block title %}Update Profile{% endblock %}
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    
+    <!-- Render user form fields -->
+    <div>
+        {{ user_form.as_p }}
+    </div>
+    
+    <!-- Render password change form fields -->
+    <div>
+        {{ password_form.as_p }}
+    </div>
+    
+    <!-- Submit button to update the profile -->
+    <button type="submit">Update</button>
+</form>
+
+<p>
+    <a href="{% url 'delete_user' %}" class="button delete">Delete Account</a>
+</p>
+{% endblock %}

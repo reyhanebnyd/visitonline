@@ -1,5 +1,9 @@
 from django.contrib.auth import authenticate,login
 from django.shortcuts import render, redirect
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import UserChangeForm, PasswordChangeForm
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Appuser
@@ -61,3 +65,39 @@ def otp_verify_view(request, username):
             return redirect('get_username')  # In case the username does not exist
 
     return render(request, 'otp_verify.html', {'username': username})
+
+@login_required
+def update_user_view(request):
+    if request.method == 'POST':
+        # Update user information
+        user_form = UserChangeForm(request.POST, instance=request.user)
+        password_form = PasswordChangeForm(request.user, request.POST)
+
+        if user_form.is_valid() and password_form.is_valid():
+            user = user_form.save()
+            password_form.save()
+            
+            # Update session to prevent logout after password change
+            update_session_auth_hash(request, user)
+            
+            messages.success(request, 'Your profile was successfully updated!')
+            return redirect('profile')  # Redirect to a profile page or any other page
+    else:
+        user_form = UserChangeForm(instance=request.user)
+        password_form = PasswordChangeForm(request.user)
+
+    return render(request, 'update_user.html', {
+        'user_form': user_form,
+        'password_form': password_form
+    })
+
+@login_required
+def delete_user_view(request):
+    if request.method == 'POST':
+        # Delete user account
+        user = request.user
+        user.delete()
+        messages.success(request, 'Your account has been deleted successfully!')
+        return redirect('signup')  # Redirect to signup or homepage after deletion
+
+    return render(request, 'delete_user.html')
