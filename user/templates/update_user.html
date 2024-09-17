@@ -5,20 +5,15 @@
 {% block title %}Update Profile{% endblock %}
 
 {% block content %}
-<form method="post">
+<form method="POST">
     {% csrf_token %}
     
-    <!-- Render user form fields -->
-    <div>
-        {{ user_form.as_p }}
-    </div>
+    <!-- User form for editing the username -->
+    {{ user_form.as_p }}
     
-    <!-- Render password change form fields -->
-    <div>
-        {{ password_form.as_p }}
-    </div>
+    <!-- Password form for changing the password -->
+    {{ password_form.as_p }}
     
-    <!-- Submit button to update the profile -->
     <button type="submit">Update</button>
 </form>
 

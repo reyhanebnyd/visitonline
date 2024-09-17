@@ -12,7 +12,7 @@ from django.http import HttpResponse
 from .forms import AddBalanceForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView
-@login_required  
+@login_required(login_url='login')
 def payment_view(request):  
     if request.method == 'GET':  
         slot = request.GET.get('slot')  
@@ -64,7 +64,7 @@ def send_payment_success_email(to_email, reservation):
 
     send_mail(subject, message, from_email, [to_email], fail_silently=False)
 
-@login_required
+@login_required(login_url='login')
 def cancel_reservation(request, reservation_id):
    
     reservation = get_object_or_404(Fulltimes, id=reservation_id, id_U=request.user.appuser)
@@ -87,12 +87,12 @@ class WalletDetailView(LoginRequiredMixin, DetailView):
     model = Wallet  
     template_name = 'wallet_detail.html'  
     context_object_name = 'wallet'  
-
+    login_url='login'
     def get_object(self, queryset=None):  
         wallet = Wallet.objects.get(uid=self.request.user.appuser)  
         return wallet  
 
-@login_required  
+@login_required(login_url='login')
 def add_balance(request):  
      
     wallet = get_object_or_404(Wallet, uid=request.user.appuser)  
@@ -113,9 +113,9 @@ def add_balance(request):
     }  
     return render(request, 'add_balance.html', context)   
 
-@login_required  
+@login_required(login_url='login')
 def reservations_page(request):  
-     
+
     reservations = Fulltimes.objects.filter(id_U=request.user.appuser)  
     
     return render(request, 'reservations.html', {'reservations': reservations})          

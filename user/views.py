@@ -1,12 +1,13 @@
-from django.contrib.auth import authenticate,login
+from django.contrib.auth import authenticate,login, logout
 from django.shortcuts import render, redirect
 from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.forms import UserChangeForm, PasswordChangeForm
+from django.contrib.auth.forms import UserChangeForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Appuser
+from .forms import CustomUserChangeForm, CustomPasswordChangeForm
 import pyotp
 from django import forms
 
@@ -89,32 +90,30 @@ def otp_verify_view(request, username):
 
     return render(request, 'otp_verify.html', {'username': username})
 
-@login_required
-def update_user_view(request):
+@login_required(login_url='login')
+def update_user(request):
     if request.method == 'POST':
-        # Update user information
-        user_form = UserChangeForm(request.POST, instance=request.user)
-        password_form = PasswordChangeForm(request.user, request.POST)
+        user_form = CustomUserChangeForm(instance=request.user, data=request.POST)
+        password_form = CustomPasswordChangeForm(data=request.POST, user=request.user)
 
         if user_form.is_valid() and password_form.is_valid():
-            user = user_form.save()
+            user_form.save()
             password_form.save()
-            
+
             # Update session to prevent logout after password change
-            update_session_auth_hash(request, user)
-            
-            messages.success(request, 'Your profile was successfully updated!')
-            return redirect('profile')  # Redirect to a profile page or any other page
+            update_session_auth_hash(request, request.user)
+            logout(request)
+            return redirect('login')  # Replace with your success URL
     else:
-        user_form = UserChangeForm(instance=request.user)
-        password_form = PasswordChangeForm(request.user)
+        user_form = CustomUserChangeForm(instance=request.user)
+        password_form = CustomPasswordChangeForm(user=request.user)
 
     return render(request, 'update_user.html', {
         'user_form': user_form,
-        'password_form': password_form
+        'password_form': password_form,
     })
 
-@login_required
+@login_required(login_url='login')
 def delete_user_view(request):
     if request.method == 'POST':
         # Delete user account

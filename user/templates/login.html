@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
 {% block header_title %}
- - Login
+Login
 {% endblock %}
 
 {% block title %}
- - Login
+Login
 {% endblock %}
 
 
@@ -14,10 +14,9 @@
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit">Login</button>
-
     </form>
     <p>Don't have an account? <a href="{% url 'signup' %}">Sign Up</a></p>
-    <p>Another way? <a href="{% url 'get_username' %}">OTP</a></p>
-    
+    <p>Another way? <a href="{% url 'get_username' %}">OTP</a> - <a href="{% url 'social:begin' 'google-oauth2' %}">Google</a> </p>
+
 
 {% endblock %}

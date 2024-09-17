@@ -7,7 +7,6 @@ from wallet.models import Wallet
 @receiver(post_save, sender=User)
 def create_appuser(sender, instance, created, **kwargs):
     if created:
-        # Create an Appuser instance whenever a new User is created
         userapp = Appuser.objects.create(user=instance)
         Wallet.objects.create(uid = userapp)
 @receiver(post_save, sender=User)

@@ -172,6 +172,14 @@
                     {% csrf_token %}
                     <button type='submit'>Reservations</button>
                 </form>
+                <form action="{% url "delete_user" %}" method="GET">
+                    {% csrf_token %}
+                    <button type='submit'>Delete user</button>
+                </form>
+                <form action="{% url "update_user" %}" method="GET">
+                    {% csrf_token %}
+                    <button type='submit'>Update user</button>
+                </form>
                 <form action="{% url "wallet_detail" %}" method="GET">
                     {% csrf_token %}
                     <button type='submit'>Wallet</button>
