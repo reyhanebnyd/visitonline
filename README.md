@@ -145,14 +145,3 @@ services:
       POSTGRES_PASSWORD=password
 \`\`\`
 
----
-
-## ✨ Contributing
-
-Feel free to open issues or submit pull requests. Your contributions are welcome!
-
----
-
-## 📧 Contact
-
-For any inquiries, reach out to [your-email@example.com](mailto:your-email@example.com).
